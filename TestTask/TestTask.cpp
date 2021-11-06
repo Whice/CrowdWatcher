@@ -8,8 +8,18 @@ const double PI = 3.14159265;
 
 struct Point
 {
-    double x;
-    double y;
+public: Point()
+{
+    this->x = 0;
+    this->y = 0;
+}
+public: Point(double x, double y)
+{
+    this->x = x;
+    this->y = y;
+}
+      double x;
+      double y;
 };
 
 /// <summary>
@@ -46,6 +56,45 @@ bool IsUnitInSight(Point& centerOfView, Point& positionUnit, double& visionAngle
         return false;
     }
 }
+/// <summary>
+/// Проверить находится ли юнитв пределах коружности или на ее границе.
+/// </summary>
+/// <param name="centerOfCircle">Точка центра окружности.</param>
+/// <param name="positionUnit">Местонахождение юнита.</param>
+/// <param name="radius">Радиус окружности.</param>
+/// <returns>true, если в переделах окружности или на ней самой.</returns>
+bool IsInsideCircle(Point& centerOfCircle, Point& positionUnit, double radius=2)
+{
+    double deltaX = positionUnit.x - centerOfCircle.x;
+    double deltaY = positionUnit.y - centerOfCircle.y;
+
+    //При хорошем разбросе юнитов эта ситуация будет встречаться чаще всего.
+    if (abs(deltaX) > radius || abs(deltaY) > radius)
+        return false;
+
+    //Если юнит все-таки где-то рядом, тогда проверить в границе ли он или на ней ли.
+    if (deltaX * deltaX + deltaY * deltaY <= radius * radius)
+    {
+        return true;
+    }
+    else
+    {
+        return false;
+    }
+}
+/// <summary>
+/// Проверяет находится ли юнит в поле видимости наблюдателя.
+/// </summary>
+/// <param name="observerLocation">Позиция наблюдателя.</param>
+/// <param name="centerOfView">Точка - центр направления взгляда.</param>
+/// <param name="positionUnit">Точка - местонахождение юнита.</param>
+/// <param name="visionAngle">Угол обзора. Размер сектора в градусах.</param>
+/// <param name="radius">Радиус окружности. Дальность видимости.</param>
+/// <returns></returns>
+bool UnitIsVisible(Point& observerLocation, Point& centerOfView, Point& positionUnit, double visionAngle = 135.5, double radius = 2)
+{
+    return IsUnitInSight(centerOfView, positionUnit, visionAngle) & IsInsideCircle(observerLocation, positionUnit, radius);
+}
 
 int main()
 {
@@ -55,7 +104,8 @@ int main()
 
     Point centerOfView;
     Point positionUnit;
-
+    Point observerLocation = Point(0, 0);
+    
     while (true)
     {
         cout << "Input visionAngle: ";
@@ -71,10 +121,14 @@ int main()
         cout << "Input positionUnit y: ";
         cin >> positionUnit.y;
 
-        if (IsUnitInSight(centerOfView, positionUnit, visionAngle))
+        if (UnitIsVisible(observerLocation, centerOfView, positionUnit, visionAngle))
+        {
             cout << "Yes";
+        }
         else
+        {
             cout << "No";
+        }
         cout << endl << endl;
     }
     double param = 45.0;                      // угол 45 градусов
