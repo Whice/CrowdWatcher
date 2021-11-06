@@ -6,7 +6,13 @@
 using namespace std;
 
 
-
+void PrintVector(vector<int> vec)
+{
+    for (int num : vec)
+    {
+        cout << num << "; ";
+    }
+}
 
 
 int main()
@@ -24,11 +30,21 @@ int main()
     units[1] = Unit(Point(1, 2), Point(1,0));
     units[2] = Unit(Point(-5, -1), Point(0.707, 0.707));
 
+    int countOfUnits = units.size();
+    for (int i = 0; i < countOfUnits; ++i)
+    {
+        units[i].CalculateUnitsVisibilityForThisUnit(units, i);
+        cout << "Count visible units for "<< i<<" unit: " << units[i].numbersUnitsInDirectionOfSight.size() << endl;
+        cout << "numbers: ";
+        PrintVector(units[i].numbersUnitsInDirectionOfSight);
+        cout << "\n\n";
+    }
 
-    Point directionOfSight;
+
+
+
+
     Point positionUnit;
-    Point observerLocation = Point(0, 0);
-    
     Unit testUnit = Unit();
 
     while (true)
