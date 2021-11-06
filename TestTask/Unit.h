@@ -9,6 +9,7 @@ const double PI = 3.14159265;
 /// </summary>
 class Unit
 {
+
 public:
 	/// <summary>
 	/// Создать юнита, задав ему позицию и направление взгляда.
@@ -136,6 +137,45 @@ public:
         this->numbersUnitsInDirectionOfSight = numbersVisibilityUnits;
     }
 
-#pragma endregion Вычисление видимости
+#pragma endregion 
+
+#pragma region Задание случайных значений
+
+    private:
+        /// <summary>
+        /// Вычислить случайный double в диапазоне.
+        /// </summary>
+        /// <param name="fMin"></param>
+        /// <param name="fMax"></param>
+        /// <returns></returns>
+        inline double fRand(double fMin, double fMax)
+        {
+            double f = (double)rand() / RAND_MAX;
+            return fMin + f * (fMax - fMin);
+        }
+    public:
+        /// <summary>
+        /// Задать случайное местоположение из указанного диапазона для обеих координат.
+        /// </summary>
+        /// <param name="min"></param>
+        /// <param name="max"></param>
+        void CalculateRandomLocation(double min, double max)
+        {
+            this->location = Point(fRand(min, max), fRand(min, max));
+        }
+        /// <summary>
+        /// Задать случайное направление из указанного диапазона для обеих координат точки направления.
+        /// </summary>
+        /// <param name="min"></param>
+        /// <param name="max"></param>
+        void CalculateRandomDirectionOfSight(double min, double max)
+        {
+            this->directionOfSight = Point(fRand(min, max), fRand(min, max));
+        }
+
+#pragma endregion 
+
 };
+
+
 
