@@ -78,7 +78,8 @@ void StartAllSaveAndLoadTests()
 		this->manyUnits.units[0].directionOfSight.x != x || this->manyUnits.units[0].directionOfSight.y != y ||
 		this->manyUnits.units[0].numbersUnitsInDirectionOfSight[0] != 1 ||
 		this->manyUnits.units[0].numbersUnitsInDirectionOfSight[1] != 2 ||
-		this->manyUnits.units[0].numbersUnitsInDirectionOfSight[2] != 3 
+		this->manyUnits.units[0].numbersUnitsInDirectionOfSight[2] != 3 ||
+		this->manyUnits.units.size()!=5
 		)
 	{
 		cout << "not complete!\n";
