@@ -1,6 +1,8 @@
 #pragma once
 #include "Point.h"
 #include <vector>
+#include <cstring>
+#include <string>
 
 const double PI = 3.14159265;
 
@@ -9,30 +11,29 @@ const double PI = 3.14159265;
 /// </summary>
 class Unit
 {
-
 public:
-	/// <summary>
-	/// Создать юнита, задав ему позицию и направление взгляда.
-	/// </summary>
-	/// <param name="location">Позиция юнита.</param>
-	/// <param name="directionOfSight">Точка, куда направлен взгляд юнита. Центр сектора.</param>
-	Unit(Point location=Point(0, 0), Point directionOfSight= Point(0, 0))
-	{
-		this->location = location;
-		this->directionOfSight = directionOfSight;
-	}
-	/// <summary>
-	/// Позиция юнита.
-	/// </summary>
-	Point location;
-	/// <summary>
-	/// Точка, куда направлен взгляд юнита. Центр сектора.
-	/// </summary>
-	Point directionOfSight;
+    /// <summary>
+    /// Создать юнита, задав ему позицию и направление взгляда.
+    /// </summary>
+    /// <param name="location">Позиция юнита.</param>
+    /// <param name="directionOfSight">Точка, куда направлен взгляд юнита. Центр сектора.</param>
+    Unit(Point location = Point(0, 0), Point directionOfSight = Point(0, 0))
+    {
+        this->location = location;
+        this->directionOfSight = directionOfSight;
+    }
+    /// <summary>
+    /// Позиция юнита.
+    /// </summary>
+    Point location;
+    /// <summary>
+    /// Точка, куда направлен взгляд юнита. Центр сектора.
+    /// </summary>
+    Point directionOfSight;
     /// <summary>
     /// Номера юнитов, которые видны этому юниту.
     /// </summary>
-	std::vector<int> numbersUnitsInDirectionOfSight;
+    std::vector<int> numbersUnitsInDirectionOfSight;
 
 #pragma region Вычисление видимости
 
@@ -43,12 +44,12 @@ private:
 /// <param name="positionUnit">Местонахождение наблюдаемого юнита.</param>
 /// <param name="halfOfVisionAngleInRadians">Угол обзора в радианах.</param>
 /// <returns></returns>
-    bool IsUnitInSight(Point& positionUnit, double& halfOfVisionAngleInRadians )
+    bool IsUnitInSight(Point& positionUnit, double& halfOfVisionAngleInRadians)
     {
         //Сдвинуть все точки так, чтобы этот юнит был в координатах 0;0
         double shiftX = this->location.x;
         double shiftY = this->location.y;
-        Point shiftDirectionOfSight = Point(this->directionOfSight.x-shiftX, this->directionOfSight.y-shiftY);
+        Point shiftDirectionOfSight = Point(this->directionOfSight.x - shiftX, this->directionOfSight.y - shiftY);
         Point shiftPositionUnit = Point(positionUnit.x - shiftX, positionUnit.y - shiftY);
 
 
@@ -119,7 +120,7 @@ public:
     {
         bool sight = IsUnitInSight(positionUnit, halfOfVisionAngleInRadians);
         bool inCircle = IsInsideCircle(positionUnit, radius);
-        return  sight&inCircle ;
+        return  sight & inCircle;
     }
 
     void CalculateUnitsVisibilityForThisUnit(std::vector<Unit>& listOfUnits)
@@ -140,39 +141,56 @@ public:
 
 #pragma region Задание случайных значений
 
-    private:
-        /// <summary>
-        /// Вычислить случайный double в диапазоне.
-        /// </summary>
-        /// <param name="fMin"></param>
-        /// <param name="fMax"></param>
-        /// <returns></returns>
-        inline double fRand(double fMin, double fMax)
-        {
-            double f = (double)rand() / RAND_MAX;
-            return fMin + f * (fMax - fMin);
-        }
-    public:
-        /// <summary>
-        /// Задать случайное местоположение из указанного диапазона для обеих координат.
-        /// </summary>
-        /// <param name="min"></param>
-        /// <param name="max"></param>
-        void CalculateRandomLocation(double min, double max)
-        {
-            this->location = Point(fRand(min, max), fRand(min, max));
-        }
-        /// <summary>
-        /// Задать случайное направление из указанного диапазона для обеих координат точки направления.
-        /// </summary>
-        /// <param name="min"></param>
-        /// <param name="max"></param>
-        void CalculateRandomDirectionOfSight(double min, double max)
-        {
-            this->directionOfSight = Point(fRand(min, max), fRand(min, max));
-        }
+private:
+    /// <summary>
+    /// Вычислить случайный double в диапазоне.
+    /// </summary>
+    /// <param name="fMin"></param>
+    /// <param name="fMax"></param>
+    /// <returns></returns>
+    inline double fRand(double fMin, double fMax)
+    {
+        double f = (double)rand() / RAND_MAX;
+        return fMin + f * (fMax - fMin);
+    }
+public:
+    /// <summary>
+    /// Задать случайное местоположение из указанного диапазона для обеих координат.
+    /// </summary>
+    /// <param name="min"></param>
+    /// <param name="max"></param>
+    void CalculateRandomLocation(double min, double max)
+    {
+        this->location = Point(fRand(min, max), fRand(min, max));
+    }
+    /// <summary>
+    /// Задать случайное направление из указанного диапазона для обеих координат точки направления.
+    /// </summary>
+    /// <param name="min"></param>
+    /// <param name="max"></param>
+    void CalculateRandomDirectionOfSight(double min, double max)
+    {
+        this->directionOfSight = Point(fRand(min, max), fRand(min, max));
+    }
 
 #pragma endregion 
+
+public:
+    std::string ToString()
+    {
+        using namespace std;
+        string returnString = "location: " + to_string(this->location.x) + ";" + to_string(this->location.y) + "; "
+            + "directionOfSight: " + to_string(this->directionOfSight.x) + ";" + to_string(this->directionOfSight.y) + "; "
+            + "numbersUnitsInDirectionOfSight: ";
+
+        for (auto it = this->numbersUnitsInDirectionOfSight.begin();
+            it != this->numbersUnitsInDirectionOfSight.end(); ++it)
+        {
+            returnString += to_string(*it) + ";";
+        }
+
+        return returnString;
+    }
 
 };
 
