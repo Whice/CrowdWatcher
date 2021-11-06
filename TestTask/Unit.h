@@ -40,7 +40,7 @@ private:
     /// <summary>
 /// Проверить, находится ли юнит в поле зрения.
 /// </summary>
-/// <param name="positionUnit">Точка - местонахождение искомого юнита.</param>
+/// <param name="positionUnit">Местонахождение наблюдаемого юнита.</param>
 /// <param name="halfOfVisionAngleInRadians">Угол обзора в радианах.</param>
 /// <returns></returns>
     bool IsUnitInSight(Point& positionUnit, double& halfOfVisionAngleInRadians )
@@ -77,13 +77,19 @@ private:
     /// <summary>
     /// Проверить находится ли юнит в пределах коружности или на ее границе.
     /// </summary>
-    /// <param name="positionUnit">Местонахождение юнита.</param>
+    /// <param name="positionUnit">Местонахождение наблюдаемого юнита.</param>
     /// <param name="radius">Радиус окружности.</param>
     /// <returns>true, если в переделах окружности или на ней самой.</returns>
     bool IsInsideCircle(Point& positionUnit, double& radius)
     {
         double deltaX = positionUnit.x - this->location.x;
         double deltaY = positionUnit.y - this->location.y;
+
+        //Если они стоят в одной точке, то они не могут друг друга видеть.
+        if (!(deltaX + deltaY))
+        {
+            return false;
+        }
 
         //При хорошем разбросе юнитов эта ситуация будет встречаться чаще всего.
         if (abs(deltaX) > radius || abs(deltaY) > radius)
@@ -104,7 +110,7 @@ public:
     /// <summary>
     /// Проверяет находится ли указанный юнит в поле видимости этого юнита.
     /// </summary>
-    /// <param name="positionUnit">Точка - местонахождение юнита.</param>
+    /// <param name="positionUnit">Местонахождение наблюдаемого юнита.</param>
     /// <param name="visionAngle">Угол обзора в радианах. Размер сектора.</param>
     /// <param name="radius">Радиус окружности. Дальность видимости.</param>
     /// <returns></returns>
@@ -116,18 +122,11 @@ public:
         return  sight&inCircle ;
     }
 
-    void CalculateUnitsVisibilityForThisUnit(std::vector<Unit>& listOfUnits, int selfNumberInList)
+    void CalculateUnitsVisibilityForThisUnit(std::vector<Unit>& listOfUnits)
     {
         std::vector<int> numbersVisibilityUnits;
         int countOfUnits = listOfUnits.size();
-        for (int i = 0; i < selfNumberInList; ++i)
-        {
-            if (this->UnitIsVisible(listOfUnits[i].location))
-            {
-                numbersVisibilityUnits.push_back(i);
-            }
-        }
-        for (int i = selfNumberInList+1; i < countOfUnits; ++i)
+        for (int i = 0; i < countOfUnits; ++i)
         {
             if (this->UnitIsVisible(listOfUnits[i].location))
             {

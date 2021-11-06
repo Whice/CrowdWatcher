@@ -143,6 +143,7 @@
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="Point.h" />
+    <ClInclude Include="SpeedTests.h" />
     <ClInclude Include="Unit.h" />
     <ClInclude Include="Units.h" />
   </ItemGroup>

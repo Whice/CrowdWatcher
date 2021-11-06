@@ -37,7 +37,18 @@ public:
             (*it).CalculateRandomDirectionOfSight(min, max);
         }
     }
+    /// <summary>
+    /// Узнать кого видит каждый из юнитов в списке.
+    /// </summary>
+    void CalculateVisionForAllUnits()
+    {
+        vector<Unit>* units = &this->units;
 
-
+        int countOfUnits = (*units).size();
+        for (auto it = (*units).begin(); it != (*units).end(); ++it)
+        {
+            (*it).CalculateUnitsVisibilityForThisUnit((*units));
+        }
+    }
 };
 
