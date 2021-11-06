@@ -46,8 +46,8 @@ private:
     bool IsUnitInSight(Point& positionUnit, double& halfOfVisionAngleInRadians )
     {
         //Сдвинуть все точки так, чтобы этот юнит был в координатах 0;0
-        int shiftX = this->location.x;
-        int shiftY = this->location.y;
+        double shiftX = this->location.x;
+        double shiftY = this->location.y;
         Point shiftDirectionOfSight = Point(this->directionOfSight.x-shiftX, this->directionOfSight.y-shiftY);
         Point shiftPositionUnit = Point(positionUnit.x - shiftX, positionUnit.y - shiftY);
 

@@ -6,6 +6,9 @@
 using namespace std;
 using namespace std::chrono;
 
+/// <summary>
+/// Класс для проведения тестов.
+/// </summary>
 class Tests
 {
 private:
@@ -13,6 +16,9 @@ private:
 Units manyUnits;
 
 public:
+/// <summary>
+/// Запустить все тесты на скорость.
+/// </summary>
 void StartAllSpeedTests()
 {
 	SpeedTest(9);
@@ -20,7 +26,12 @@ void StartAllSpeedTests()
 	SpeedTest(999);
 	SpeedTest(9999);
 }
+
 private:
+/// <summary>
+/// Запустить тест на скорость, с определенным количеством юнитов.
+/// /// </summary>
+/// <param name="countOfUnits"></param>
 void SpeedTest(int countOfUnits)
 {
 	const int countOfRepeats = this->countOfRepeats;
