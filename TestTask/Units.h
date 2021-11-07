@@ -1,4 +1,4 @@
-#pragma once
+п»ї#pragma once
 #include "Unit.h"
 #include <fstream>
 #include <cstring>
@@ -6,8 +6,8 @@
 using namespace std;
 
 /// <summary>
-/// Класс, который хранит список юнитов.
-/// Имеет методы сохранения и загрузки списка юнитов из файлов.
+/// РљР»Р°СЃСЃ, РєРѕС‚РѕСЂС‹Р№ С…СЂР°РЅРёС‚ СЃРїРёСЃРѕРє СЋРЅРёС‚РѕРІ.
+/// РРјРµРµС‚ РјРµС‚РѕРґС‹ СЃРѕС…СЂР°РЅРµРЅРёСЏ Рё Р·Р°РіСЂСѓР·РєРё СЃРїРёСЃРєР° СЋРЅРёС‚РѕРІ РёР· С„Р°Р№Р»РѕРІ.
 /// </summary>
 class Units
 {
@@ -19,16 +19,16 @@ public:
 
 public:
     /// <summary>
-    /// Список юнитов.
+    /// РЎРїРёСЃРѕРє СЋРЅРёС‚РѕРІ.
     /// </summary>
     vector<Unit> units;
 
 public:
     /// <summary>
-    /// Уcтановить всем юнитам случайные параметры местонахождения и направления.
+    /// РЈcС‚Р°РЅРѕРІРёС‚СЊ РІСЃРµРј СЋРЅРёС‚Р°Рј СЃР»СѓС‡Р°Р№РЅС‹Рµ РїР°СЂР°РјРµС‚СЂС‹ РјРµСЃС‚РѕРЅР°С…РѕР¶РґРµРЅРёСЏ Рё РЅР°РїСЂР°РІР»РµРЅРёСЏ.
     /// </summary>
-    /// <param name="min">Нижняя граница для случайно задаваемых значений.</param>
-    /// <param name="max">Верхняя граница для случайно задаваемых значений.</param>
+    /// <param name="min">РќРёР¶РЅСЏСЏ РіСЂР°РЅРёС†Р° РґР»СЏ СЃР»СѓС‡Р°Р№РЅРѕ Р·Р°РґР°РІР°РµРјС‹С… Р·РЅР°С‡РµРЅРёР№.</param>
+    /// <param name="max">Р’РµСЂС…РЅСЏСЏ РіСЂР°РЅРёС†Р° РґР»СЏ СЃР»СѓС‡Р°Р№РЅРѕ Р·Р°РґР°РІР°РµРјС‹С… Р·РЅР°С‡РµРЅРёР№.</param>
     /// <returns></returns>
     void SetRandomParametrsForAllUnits(double min, double max)
     {
@@ -40,7 +40,7 @@ public:
         }
     }
     /// <summary>
-    /// Узнать кого видит каждый из юнитов в списке.
+    /// РЈР·РЅР°С‚СЊ РєРѕРіРѕ РІРёРґРёС‚ РєР°Р¶РґС‹Р№ РёР· СЋРЅРёС‚РѕРІ РІ СЃРїРёСЃРєРµ.
     /// </summary>
     void CalculateVisionForAllUnits()
     {
@@ -54,53 +54,59 @@ public:
     }
 
 
-#pragma region Сохранение и загрузка
+#pragma region РЎРѕС…СЂР°РЅРµРЅРёРµ Рё Р·Р°РіСЂСѓР·РєР°
 
     void Load(string name)
     {
         ifstream in = ifstream(name);
-        this->units.clear();
-        string stroka;
+        this->units = vector<Unit>();
+        string stringLine;
         string token;
-        while (!in.eof())
+
+        getline(in, stringLine);
+        do
         {
-            getline(in, stroka);
-            if (stroka == "")
-                break;
+            
             /* "Unit number " << i << ": " +"location: " + to_string(this->location.x) + ";" + to_string(this->location.y) + "; "
             + "directionOfSight: " + to_string(this->directionOfSight.x) + ";" + to_string(this->directionOfSight.y) + "; "
             + "numbersUnitsInDirectionOfSight: ";*/
             
-            stroka = stroka.erase(0, stroka.find("n: ") + 3);
-            token = stroka.substr(0, stroka.find(";"));
+            stringLine = stringLine.erase(0, stringLine.find("n: ") + 3);
+            token = stringLine.substr(0, stringLine.find(";"));
             Unit unit;
             unit.location.x = std::stod(token);
 
-            stroka = stroka.erase(0, stroka.find(";") + 1);
-            token = stroka.substr(0, stroka.find(";"));
+            stringLine = stringLine.erase(0, stringLine.find(";") + 1);
+            token = stringLine.substr(0, stringLine.find(";"));
             unit.location.y = std::stod(token);
 
-            stroka = stroka.erase(0, stroka.find(": ") + 2);
-            token = stroka.substr(0, stroka.find(";"));
+            stringLine = stringLine.erase(0, stringLine.find(": ") + 2);
+            token = stringLine.substr(0, stringLine.find(";"));
             unit.directionOfSight.x = std::stod(token);
 
-            stroka = stroka.erase(0, stroka.find(";") + 1);
-            token = stroka.substr(0, stroka.find(";"));
+            stringLine = stringLine.erase(0, stringLine.find(";") + 1);
+            token = stringLine.substr(0, stringLine.find(";"));
             unit.directionOfSight.y = std::stod(token);
 
-            stroka = stroka.erase(0, stroka.find(": ") + 2);
-            while (stroka != "")
+            stringLine = stringLine.erase(0, stringLine.find(": ") + 2);
+            while (stringLine != "")
             {
-                token = stroka.substr(0, stroka.find(";"));
+                token = stringLine.substr(0, stringLine.find(";"));
                 unit.numbersUnitsInDirectionOfSight.push_back(std::atoi(token.c_str()));
-                stroka = stroka.erase(0, stroka.find(";") + 1);
+                stringLine = stringLine.erase(0, stringLine.find(";") + 1);
             }
             this->units.push_back(unit);
-        }
+
+            getline(in, stringLine);
+        } 
+        while (stringLine != "");
 
         in.close();
     }
-
+    /// <summary>
+    /// РЎРѕС…СЂР°РЅРµРЅРёРµ РІ С‚РµСЃРєСЃС‚РѕРІРѕР№ С„Р°Р№Р» СЃ РЅСѓРјРµСЂР°С†РёРµР№.
+    /// </summary>
+    /// <param name="name"></param>
     void Save(string name)
     {
         ofstream out = ofstream(name);

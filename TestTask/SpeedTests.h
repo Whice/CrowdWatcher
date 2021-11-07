@@ -1,4 +1,4 @@
-#pragma once
+п»ї#pragma once
 #include <chrono>
 #include "Units.h"
 #include <iostream>
@@ -7,7 +7,7 @@ using namespace std;
 using namespace std::chrono;
 
 /// <summary>
-/// Класс для проведения тестов.
+/// РљР»Р°СЃСЃ РґР»СЏ РїСЂРѕРІРµРґРµРЅРёСЏ С‚РµСЃС‚РѕРІ.
 /// </summary>
 class Tests
 {
@@ -17,7 +17,7 @@ Units manyUnits;
 
 public:
 /// <summary>
-/// Запустить все тесты на скорость.
+/// Р—Р°РїСѓСЃС‚РёС‚СЊ РІСЃРµ С‚РµСЃС‚С‹ РЅР° СЃРєРѕСЂРѕСЃС‚СЊ.
 /// </summary>
 void StartAllSpeedTests()
 {
@@ -29,25 +29,25 @@ void StartAllSpeedTests()
 
 private:
 /// <summary>
-/// Запустить тест на скорость, с определенным количеством юнитов.
+/// Р—Р°РїСѓСЃС‚РёС‚СЊ С‚РµСЃС‚ РЅР° СЃРєРѕСЂРѕСЃС‚СЊ, СЃ РѕРїСЂРµРґРµР»РµРЅРЅС‹Рј РєРѕР»РёС‡РµСЃС‚РІРѕРј СЋРЅРёС‚РѕРІ.
 /// /// </summary>
 /// <param name="countOfUnits"></param>
 void SpeedTest(int countOfUnits)
 {
 	const int countOfRepeats = this->countOfRepeats;
 
-	cout << "Количество юнитов: " << countOfUnits << endl;
+	cout << "РљРѕР»РёС‡РµСЃС‚РІРѕ СЋРЅРёС‚РѕРІ: " << countOfUnits << endl;
 
 	this->manyUnits = Units(countOfUnits);
 	this->manyUnits.SetRandomParametrsForAllUnits(-100, 100);
 
-	//Запомнить время запуска.
+	//Р—Р°РїРѕРјРЅРёС‚СЊ РІСЂРµРјСЏ Р·Р°РїСѓСЃРєР°.
 	auto start = system_clock::now();
 
 	for(int i=0;i<countOfRepeats;++i)
 		this->manyUnits.CalculateVisionForAllUnits();
 
 	auto end = system_clock::now();
-	std::cout << "Выполнение заняло: " << ((duration<double>)(end - start)).count() << "\n\n";
+	std::cout << "Р’С‹РїРѕР»РЅРµРЅРёРµ Р·Р°РЅСЏР»Рѕ: " << ((duration<double>)(end - start)).count() << "\n\n";
 }
 };
