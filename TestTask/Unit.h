@@ -5,7 +5,6 @@
 #include <string>
 #include <xmmintrin.h>
 
-const double PI = 3.14159265;
 
 /// <summary>
 /// Класс определяющий юнита.
@@ -35,6 +34,16 @@ public:
     /// Номера юнитов, которые видны этому юниту.
     /// </summary>
     std::vector<int> numbersUnitsInDirectionOfSight;
+    const double PI = 3.141592653;
+    /// <summary>
+    /// Половина угла обзора в радианах.
+    /// По умолчанию: (135.5/2) * (PI / 180)
+    /// </summary>
+    double halfOfVisionAngleInRadians = (135.5 * PI) / 360;
+    /// <summary>
+    /// Радиус - дальность обзора.
+    /// </summary>
+    double radius = 2;
 
 #pragma region Вычисление видимости
 
@@ -43,9 +52,8 @@ private:
 /// Проверить, находится ли юнит в поле зрения.
 /// </summary>
 /// <param name="positionUnit">Местонахождение наблюдаемого юнита.</param>
-/// <param name="halfOfVisionAngleInRadians">Угол обзора в радианах.</param>
 /// <returns></returns>
-    inline bool IsUnitInSight(Point positionUnit, double halfOfVisionAngleInRadians)
+    inline bool IsUnitInSight(Point positionUnit)
     {
         //Сдвинуть все точки так, чтобы этот юнит был в координатах 0;0
         double shiftX = this->location.x;
@@ -67,7 +75,7 @@ private:
         double angleOfVectorToUnit = atan(shiftPositionUnit.y / shiftPositionUnit.x);
 
         //Если разница между углом зрения и местоположением меньше половины угла обзора, то юнит видно.
-        if (abs(angleOfView - angleOfVectorToUnit) < halfOfVisionAngleInRadians)
+        if (abs(angleOfView - angleOfVectorToUnit) < this->halfOfVisionAngleInRadians)
         {
             return true;
         }
@@ -80,19 +88,18 @@ private:
     /// Проверить находится ли юнит в пределах коружности или на ее границе.
     /// </summary>
     /// <param name="positionUnit">Местонахождение наблюдаемого юнита.</param>
-    /// <param name="radius">Радиус окружности.</param>
     /// <returns>true, если в переделах окружности или на ней самой.</returns>
-    inline bool IsInsideCircle(Point positionUnit, double radius)
+    inline bool IsInsideCircle(Point positionUnit)
     {
         double deltaX = positionUnit.x - this->location.x;
         double deltaY = positionUnit.y - this->location.y;
+        const double radius = this->radius;
 
         //Если они стоят в одной точке, то они не могут друг друга видеть.
         if (!(deltaX + deltaY))
         {
             return false;
         }
-
         //При хорошем разбросе юнитов эта ситуация будет встречаться чаще всего.
         if (abs(deltaX) > radius || abs(deltaY) > radius)
             return false;
@@ -113,14 +120,11 @@ public:
     /// Проверяет находится ли указанный юнит в поле видимости этого юнита.
     /// </summary>
     /// <param name="positionUnit">Местонахождение наблюдаемого юнита.</param>
-    /// <param name="visionAngle">Угол обзора в радианах. Размер сектора.</param>
-    /// <param name="radius">Радиус окружности. Дальность видимости.</param>
     /// <returns></returns>
-    inline bool UnitIsVisible(Point positionUnit, double halfOfVisionAngleInRadians = (135.5 * PI) / 360/*135.5/2 * PI / 180*/,
-        double radius = 2)
+    inline bool UnitIsVisible(Point positionUnit)
     {
-        bool sight = IsUnitInSight(positionUnit, halfOfVisionAngleInRadians);
-        bool inCircle = IsInsideCircle(positionUnit, radius);
+        bool sight = IsUnitInSight(positionUnit);
+        bool inCircle = IsInsideCircle(positionUnit);
         return  sight & inCircle;
     }
     /// <summary>

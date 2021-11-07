@@ -35,6 +35,7 @@ void StartAllSpeedTests()
 }
 
 private:
+	double  spreadOfValues = 3000;
 /// <summary>
 /// Запустить тест на скорость, с определенным количеством юнитов.
 /// /// </summary>
@@ -46,7 +47,7 @@ void SpeedTest(int countOfUnits)
 	cout << "Количество юнитов: " << countOfUnits << endl;
 
 	this->manyUnits = Units(countOfUnits);
-	this->manyUnits.SetRandomParametrsForAllUnits(-100, 100);
+	this->manyUnits.SetRandomParametrsForAllUnits(-this->spreadOfValues, this->spreadOfValues);
 
 	//Запомнить время запуска.
 	auto start = system_clock::now();
@@ -58,17 +59,17 @@ void SpeedTest(int countOfUnits)
 	std::cout << "Выполнение заняло: " << ((duration<double>)(end - start)).count() << "\n\n";
 }
 /// <summary>
-/// Запустить тест на скорость, с определенным количеством юнитов.
+/// Запустить тест на скорость, с определенным количеством юнитов с использованием потоков.
 /// /// </summary>
 /// <param name="countOfUnits"></param>
 void SpeedTestParallel(int countOfUnits)
 {
 	const int countOfRepeats = this->countOfRepeats;
 
-	cout << "Количество юнитов: " << countOfUnits << endl;
+	cout << "Количество юнитов(параллельный код): " << countOfUnits << endl;
 
 	this->manyUnits = Units(countOfUnits);
-	this->manyUnits.SetRandomParametrsForAllUnits(-100, 100);
+	this->manyUnits.SetRandomParametrsForAllUnits(-this->spreadOfValues, this->spreadOfValues);
 
 	//Запомнить время запуска.
 	auto start = system_clock::now();
@@ -93,21 +94,27 @@ void StartAllSaveAndLoadTests()
 	string name = "Test save.txt";
 	double x= 3.45;
 	double y= 5.89;
+
 	this->manyUnits = Units(5);
 	this->manyUnits.units[0].location = Point(x, y);
 	this->manyUnits.units[0].directionOfSight = Point(x, y);
 	this->manyUnits.units[0].numbersUnitsInDirectionOfSight = {1,2, 3};
+
 	this->manyUnits.Save(name);
 	this->manyUnits.Load(name);
+
+
 	cout << "\nSave and load tests was ";
-	if (this->manyUnits.units[0].location.x != x || this->manyUnits.units[0].location.y != y ||
-		this->manyUnits.units[0].directionOfSight.x != x || this->manyUnits.units[0].directionOfSight.y != y ||
+	if (this->manyUnits.units[0].location.x != x ||
+		this->manyUnits.units[0].location.y != y ||
+		this->manyUnits.units[0].directionOfSight.x != x ||
+		this->manyUnits.units[0].directionOfSight.y != y ||
 		this->manyUnits.units[0].numbersUnitsInDirectionOfSight[0] != 1 ||
 		this->manyUnits.units[0].numbersUnitsInDirectionOfSight[1] != 2 ||
 		this->manyUnits.units[0].numbersUnitsInDirectionOfSight[2] != 3 ||
 		this->manyUnits.units.size()!=5
 		)
-	{
+	{//Если хоть что-то не совпало после загрузки, то тест не пройден.
 		cout << "not complete!\n";
 	}
 	else

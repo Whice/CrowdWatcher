@@ -1,4 +1,4 @@
-﻿
+﻿#pragma once
 #include <iostream>
 #include <conio.h>
 #include <cmath>
@@ -7,17 +7,21 @@
 #include <cstring>
 #include <string>
 
+
+
+
 using namespace std;
 
 int main()
 {
 
     setlocale(LC_ALL, "");
-    double visionAngle = 135.5;
 
-
+    //Создать тестовый объект
     Tests test;
+    //Тесты скорости
     test.StartAllSpeedTests();
+    //Тесты сохранения и загрузки
     test.StartAllSaveAndLoadTests();
 
     _getch();
