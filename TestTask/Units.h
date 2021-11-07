@@ -2,6 +2,7 @@
 #include "Unit.h"
 #include <fstream>
 #include <cstring>
+#include <thread>
 
 using namespace std;
 
@@ -46,16 +47,51 @@ public:
     {
         vector<Unit>* units = &this->units;
 
+        auto end = (*units).end();
+        for (auto it = (*units).begin(); it != end; ++it)
+        {
+            (*it).CalculateUnitsVisibilityForThisUnit((*units));
+        }
+    }
+    /// <summary>
+    /// Узнать кого видит каждый из юнитов в списке.
+    /// </summary>
+    void CalculateVisionForAllUnitsParallel()
+    {
+        const uint16_t processorCount = std::thread::hardware_concurrency();
+
+        vector<thread> treads(processorCount);
+
+        vector<Unit>* units = &this->units;
+
+        for (int i = 0; i < processorCount; ++i)
+        {
+            treads[i] = thread([i, processorCount, units]() { Units::PerfromCircleCalculateVisionForAllUnitsParallel(i, processorCount, units); });
+        }
+        for (int i = 0; i < processorCount; ++i)
+        {
+            treads[i].join();
+        }
+    }
+public:
+    static void PerfromCircleCalculateVisionForAllUnitsParallel(int partNumber, const uint16_t processorCount, vector<Unit>*units)
+    {
         int countOfUnits = (*units).size();
-        for (auto it = (*units).begin(); it != (*units).end(); ++it)
+
+        int startNumber = partNumber * countOfUnits / processorCount;
+        int endNumer = (partNumber +1)* countOfUnits / processorCount;
+
+        auto start = (*units).begin() + startNumber;
+        auto end = (*units).begin()+endNumer;
+        for (auto it = start; it != end; ++it)
         {
             (*it).CalculateUnitsVisibilityForThisUnit((*units));
         }
     }
 
-
 #pragma region Сохранение и загрузка
 
+public:
     void Load(string name)
     {
         ifstream in = ifstream(name);
