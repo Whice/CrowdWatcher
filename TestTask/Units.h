@@ -34,7 +34,8 @@ public:
     void SetRandomParametrsForAllUnits(double min, double max)
     {
         int countOfUnits = this->units.size();
-        for (auto it = this->units.begin(); it < this->units.end(); ++it)
+        auto end = this->units.end();
+        for (auto it = this->units.begin(); it < end ; ++it)
         {
             (*it).CalculateRandomLocation(min, max);
             (*it).CalculateRandomDirectionOfSight(min, max);

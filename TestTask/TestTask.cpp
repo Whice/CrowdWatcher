@@ -1,4 +1,5 @@
-﻿#include <iostream>
+﻿
+#include <iostream>
 #include <conio.h>
 #include <cmath>
 #include "Units.h"
@@ -10,6 +11,8 @@ using namespace std;
 
 int main()
 {
+
+
     setlocale(LC_ALL, "");
     double visionAngle = 135.5;
 
