@@ -136,9 +136,9 @@ LRESULT CALLBACK WndProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam)
     {
     case WM_CREATE:
     {
-        units = Units(1080 * 1080 / 1000, 500);
+        units = Units(1080 * 1080 / 1000, 400);
         units.SetRandomParametrsForAllUnits(0, 1080);
-        units.units[0].location = Point(300, 300);
+        units.units[0].location = Point(500, 400);
         uPainter = UnitPainter();
     }
     break;
@@ -162,7 +162,9 @@ LRESULT CALLBACK WndProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam)
     case WM_MOUSEMOVE:
     {
         //Наблюдатель поворачивает голову за мышью
+
         units.units[0].directionOfSight = Point(LOWORD(lParam), HIWORD(lParam));
+
         units.units[0].FindNumberOfUnitsThatThisUnitSees(units.units);
 
         InvalidateRect(hWnd, NULL, FALSE);

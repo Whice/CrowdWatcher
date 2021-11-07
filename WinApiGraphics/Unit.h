@@ -34,7 +34,7 @@ public:
     /// Номера юнитов, которые видны этому юниту.
     /// </summary>
     std::vector<int> numbersUnitsInDirectionOfSight;
-    
+
     /// <summary>
     /// Половина угла обзора в радианах.
     /// По умолчанию: (135.5/2) * (PI / 180)
@@ -49,6 +49,12 @@ public:
 
 private:
 
+    /// <summary>
+    /// Находится ли вектор второй точки по направлению "против часовой стрелки" по отношению к первой.
+    /// </summary>
+    /// <param name="p1"></param>
+    /// <param name="p2"></param>
+    /// <returns></returns>
     bool AreClockwise(Point p1, Point p2)
     {
         return (-p1.x * p2.y + p1.y * p2.x) > 0;
@@ -58,43 +64,14 @@ private:
     /// </summary>
     /// <param name="point"></param>
     /// <param name="angle">Угол в радианах.</param>
-    /// <param name="radius"></param>
+    /// <param name="angleOfView">Изначальный угол обзора.</param>
     /// <returns></returns>
-    Point RotatePointOnCircle(Point point, double angle)
+    Point RotatePointOnCircle(Point point, double angle, double angleOfView)
     {
         Point rotatePoint;
-        rotatePoint.x = this->radius * cos(angle);
-        rotatePoint.y = this->radius * sin(angle);
+        rotatePoint.x = this->radius * cos(angle + angleOfView);
+        rotatePoint.y = this->radius * sin(angle + angleOfView);
         return rotatePoint;
-    }
-    bool isInsideSector(Point positionUnit, Point shiftDirectionOfSight)
-    {
-
-        //Посчитать sectorStart и sectorEnd
-        Point sectorStart = RotatePointOnCircle(shiftDirectionOfSight, this->halfOfVisionAngleInRadians);
-        Point sectorEnd = RotatePointOnCircle(shiftDirectionOfSight, -this->halfOfVisionAngleInRadians);
-
-        return !AreClockwise(sectorStart, positionUnit) &&
-            AreClockwise(sectorEnd, positionUnit);
-    }
-
-    /// <summary>
-    /// Проверить, что точки находятся в одной четверти.
-    /// </summary>
-    /// <param name="firstPoint"></param>
-    /// <param name="secondPoint"></param>
-    /// <returns>true, если они в одной четверти.</returns>
-    bool DotsInOneQuarter(Point firstPoint, Point secondPoint)
-    {
-        bool isBothHigherOrLowerThanX = false;
-        if ((firstPoint.x >= 0 && secondPoint.x >= 0) ||
-            (firstPoint.x <= 0 && secondPoint.x <= 0))
-            isBothHigherOrLowerThanX = true;
-        bool isBothHigherOrLowerThanY = false;
-        if ((firstPoint.y >= 0 && secondPoint.y >= 0) ||
-            (firstPoint.y <= 0 && secondPoint.y <= 0))
-            isBothHigherOrLowerThanY = true;
-        return isBothHigherOrLowerThanX & isBothHigherOrLowerThanY;
     }
     /// <summary>
 /// Проверить, находится ли юнит в поле зрения.
@@ -109,27 +86,35 @@ private:
         Point shiftDirectionOfSight = Point(this->directionOfSight.x - shiftX, this->directionOfSight.y - shiftY);
         Point shiftPositionUnit = Point(positionUnit.x - shiftX, positionUnit.y - shiftY);
 
-        /*
-        //Если позиция юнита "за спиной" у смотрящего.
-        // Позиции не могут быть далеко друг от друга из-за ограниченности дальности видимости.
-        // Потому можно перемножать и не боться переполнения.
-        if ((shiftDirectionOfSight.x * shiftPositionUnit.x < 0) && (shiftDirectionOfSight.y * shiftPositionUnit.y < 0) ||
-            (shiftDirectionOfSight.x * shiftPositionUnit.x == 0) && (shiftDirectionOfSight.y * shiftPositionUnit.y < 0) ||
-            (shiftDirectionOfSight.x * shiftPositionUnit.x < 0) && (shiftDirectionOfSight.y * shiftPositionUnit.y == 0))
-        {
-            return false;
-        }
-        //найти в радианах соответствующие углы зрению и метоположению
-        double angleOfView = atan(shiftDirectionOfSight.y / shiftDirectionOfSight.x);
-        double angleOfVectorToUnit = atan(shiftPositionUnit.y / shiftPositionUnit.x);*/
+        double gipotenusa = sqrt(shiftDirectionOfSight.x * shiftDirectionOfSight.x
+            + shiftDirectionOfSight.y * shiftDirectionOfSight.y);
+        shiftDirectionOfSight.x = (shiftDirectionOfSight.x * this->radius) / gipotenusa;
+        shiftDirectionOfSight.y = (shiftDirectionOfSight.y * this->radius) / gipotenusa;
 
-        //Если разница между углом зрения и местоположением меньше половины угла обзора, то юнит видно.
-        if (isInsideSector(shiftPositionUnit, shiftDirectionOfSight))
+        //найти в радианах соответствующий угл зрению
+        double angleOfView;
+        if (shiftDirectionOfSight.x < 0)
+        {
+            angleOfView = atan(shiftDirectionOfSight.y / shiftDirectionOfSight.x);
+        }
+        else
+        {
+            angleOfView = PI + atan(shiftDirectionOfSight.y / shiftDirectionOfSight.x);
+        }
+
+        //Посчитать sectorStart и sectorEnd
+        Point sectorStart = RotatePointOnCircle(shiftDirectionOfSight, this->halfOfVisionAngleInRadians, angleOfView);
+        Point sectorEnd = RotatePointOnCircle(shiftDirectionOfSight, -1 * (this->halfOfVisionAngleInRadians), angleOfView);
+
+
+        //Если он находится между "левой" и "правой" границами обзора, то юнит видно.
+        if (!AreClockwise(sectorStart, shiftPositionUnit) &&
+            AreClockwise(sectorEnd, shiftPositionUnit))
         {
             return true;
         }
 
-        //Если мы уже тут, то не видно юнита.
+        //Если мы тут, то не видно юнита.
         return false;
     }
     /// <summary>
@@ -259,8 +244,4 @@ public:
 
         return returnString;
     }
-
 };
-
-
-
