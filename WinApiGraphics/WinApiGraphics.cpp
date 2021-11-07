@@ -3,6 +3,10 @@
 
 #include "framework.h"
 #include "WinApiGraphics.h"
+#include "UnitPainter.h"
+
+Units units;
+UnitPainter uPainter;
 
 #define MAX_LOADSTRING 100
 
@@ -123,8 +127,21 @@ BOOL InitInstance(HINSTANCE hInstance, int nCmdShow)
 //
 LRESULT CALLBACK WndProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam)
 {
+    PAINTSTRUCT ps;
+    RECT Rect;
+    HDC hdc, hCmpDC;
+    HBITMAP hBmp;
+
     switch (message)
     {
+    case WM_CREATE:
+    {
+        units = Units(1080 * 1080 / 1000, 500);
+        units.SetRandomParametrsForAllUnits(0, 1080);
+        units.units[0].location = Point(300, 300);
+        uPainter = UnitPainter();
+    }
+        break;
     case WM_COMMAND:
         {
             int wmId = LOWORD(wParam);
@@ -142,12 +159,44 @@ LRESULT CALLBACK WndProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam)
             }
         }
         break;
+    case WM_MOUSEMOVE:
+    {
+        //Наблюдатель поворачивает голову за мышью
+        units.units[0].directionOfSight = Point(LOWORD(lParam),  HIWORD(lParam));
+        units.units[0].FindNumberOfUnitsThatThisUnitSees(units.units);
+        InvalidateRect(hWnd, NULL, FALSE);
+    }
+    break;
+    case WM_SIZE:
+    {
+        uPainter.backSizeWidth = LOWORD(lParam);
+        uPainter.backSizeHeight = HIWORD(lParam);
+    }
     case WM_PAINT:
         {
-            PAINTSTRUCT ps;
-            HDC hdc = BeginPaint(hWnd, &ps);
-            // TODO: Добавьте сюда любой код прорисовки, использующий HDC...
-            Ellipse(hdc, 120, 130, 180, 190);
+        GetClientRect(hWnd, &Rect);
+        hdc = BeginPaint(hWnd, &ps);
+
+
+        // Создание теневого контекста для двойной буферизации
+        hCmpDC = CreateCompatibleDC(hdc);
+        hBmp = CreateCompatibleBitmap(hdc, Rect.right - Rect.left, Rect.bottom - Rect.top);
+        SelectObject(hCmpDC, hBmp);
+
+            
+
+            uPainter.ClearBackground(hCmpDC);
+
+            uPainter.DrawVisibleUnitsForUnit(hCmpDC, 0, &units.units);
+            uPainter.DrawUnit(hCmpDC, units.units[0]);
+            
+            // Копируем изображение из теневого контекста на экран
+            SetStretchBltMode(hdc, COLORONCOLOR);
+            BitBlt(hdc, 0, 0, Rect.right - Rect.left, Rect.bottom - Rect.top,
+                hCmpDC, 0, 0, SRCCOPY);
+            hCmpDC = NULL;
+            hdc = NULL;
+
             EndPaint(hWnd, &ps);
         }
         break;
