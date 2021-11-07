@@ -12,7 +12,6 @@ using namespace std;
 int main()
 {
 
-
     setlocale(LC_ALL, "");
     double visionAngle = 135.5;
 

@@ -3,6 +3,7 @@
 #include <vector>
 #include <cstring>
 #include <string>
+#include <xmmintrin.h>
 
 const double PI = 3.14159265;
 
@@ -44,7 +45,7 @@ private:
 /// <param name="positionUnit">Местонахождение наблюдаемого юнита.</param>
 /// <param name="halfOfVisionAngleInRadians">Угол обзора в радианах.</param>
 /// <returns></returns>
-    bool IsUnitInSight(Point& positionUnit, double& halfOfVisionAngleInRadians)
+    inline bool IsUnitInSight(Point positionUnit, double halfOfVisionAngleInRadians)
     {
         //Сдвинуть все точки так, чтобы этот юнит был в координатах 0;0
         double shiftX = this->location.x;
@@ -81,7 +82,7 @@ private:
     /// <param name="positionUnit">Местонахождение наблюдаемого юнита.</param>
     /// <param name="radius">Радиус окружности.</param>
     /// <returns>true, если в переделах окружности или на ней самой.</returns>
-    bool IsInsideCircle(Point& positionUnit, double& radius)
+    inline bool IsInsideCircle(Point positionUnit, double radius)
     {
         double deltaX = positionUnit.x - this->location.x;
         double deltaY = positionUnit.y - this->location.y;
@@ -115,15 +116,18 @@ public:
     /// <param name="visionAngle">Угол обзора в радианах. Размер сектора.</param>
     /// <param name="radius">Радиус окружности. Дальность видимости.</param>
     /// <returns></returns>
-    bool UnitIsVisible(Point& positionUnit, double halfOfVisionAngleInRadians = (135.5 * PI) / 360/*135.5/2 * PI / 180*/,
+    inline bool UnitIsVisible(Point positionUnit, double halfOfVisionAngleInRadians = (135.5 * PI) / 360/*135.5/2 * PI / 180*/,
         double radius = 2)
     {
         bool sight = IsUnitInSight(positionUnit, halfOfVisionAngleInRadians);
         bool inCircle = IsInsideCircle(positionUnit, radius);
         return  sight & inCircle;
     }
-
-    void CalculateUnitsVisibilityForThisUnit(std::vector<Unit>& listOfUnits)
+    /// <summary>
+    /// Узнать номера юнитов, которых видит этот юнит.
+    /// </summary>
+    /// <param name="listOfUnits"></param>
+    void FindNumberOfUnitsThatThisUnitSees(std::vector<Unit>& listOfUnits)
     {
         std::vector<int> numbersVisibilityUnits;
         int countOfUnits = listOfUnits.size();
@@ -135,6 +139,14 @@ public:
             }
         }
         this->numbersUnitsInDirectionOfSight = numbersVisibilityUnits;
+    }
+    /// <summary>
+    /// Получить количество юнитов, которых видит этот юнит.
+    /// </summary>
+    /// <returns></returns>
+    int GetCountVisibilityUnits()
+    {
+        return this->numbersUnitsInDirectionOfSight.size();
     }
 
 #pragma endregion 
@@ -176,6 +188,10 @@ public:
 #pragma endregion 
 
 public:
+    /// <summary>
+    /// Перевести значения объекта в строковое представление.
+    /// </summary>
+    /// <returns></returns>
     std::string ToString()
     {
         using namespace std;

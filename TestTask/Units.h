@@ -51,11 +51,11 @@ public:
         auto end = (*units).end();
         for (auto it = (*units).begin(); it != end; ++it)
         {
-            (*it).CalculateUnitsVisibilityForThisUnit((*units));
+            (*it).FindNumberOfUnitsThatThisUnitSees((*units));
         }
     }
     /// <summary>
-    /// Узнать кого видит каждый из юнитов в списке.
+    /// Узнать кого видит каждый из юнитов в списке. Многопоточное выполнение.
     /// </summary>
     void CalculateVisionForAllUnitsParallel()
     {
@@ -75,24 +75,34 @@ public:
         }
     }
 public:
-    static void PerfromCircleCalculateVisionForAllUnitsParallel(int partNumber, const uint16_t processorCount, vector<Unit>*units)
+    /// <summary>
+    /// Выполнение цикла проверки видимости других юнитов в одном потоке. 
+    /// </summary>
+    /// <param name="threadNumber">Номер потока выполнения.</param>
+    /// <param name="processorCount">Общее количество потоков, на которых идет выполнение.</param>
+    /// <param name="units">Список юнитов.</param>
+    static void PerfromCircleCalculateVisionForAllUnitsParallel(int threadNumber, const uint16_t processorCount, vector<Unit>*units)
     {
         int countOfUnits = (*units).size();
 
-        int startNumber = partNumber * countOfUnits / processorCount;
-        int endNumer = (partNumber +1)* countOfUnits / processorCount;
+        int startNumber = threadNumber * countOfUnits / processorCount;
+        int endNumer = (threadNumber +1)* countOfUnits / processorCount;
 
         auto start = (*units).begin() + startNumber;
         auto end = (*units).begin()+endNumer;
         for (auto it = start; it != end; ++it)
         {
-            (*it).CalculateUnitsVisibilityForThisUnit((*units));
+            (*it).FindNumberOfUnitsThatThisUnitSees((*units));
         }
     }
 
 #pragma region Сохранение и загрузка
 
 public:
+    /// <summary>
+    /// Загрузка из текстового файла.
+    /// </summary>
+    /// <param name="name"></param>
     void Load(string name)
     {
         ifstream in = ifstream(name);

@@ -30,8 +30,8 @@ void StartAllSpeedTests()
 	SpeedTestParallel(99);
 	SpeedTest(999);
 	SpeedTestParallel(999);
-	SpeedTest(9999);
-	SpeedTestParallel(9999);
+	SpeedTest(9'999);
+	SpeedTestParallel(9'999);
 }
 
 private:
