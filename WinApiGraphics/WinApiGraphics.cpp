@@ -141,29 +141,30 @@ LRESULT CALLBACK WndProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam)
         units.units[0].location = Point(300, 300);
         uPainter = UnitPainter();
     }
-        break;
+    break;
     case WM_COMMAND:
+    {
+        int wmId = LOWORD(wParam);
+        // Разобрать выбор в меню:
+        switch (wmId)
         {
-            int wmId = LOWORD(wParam);
-            // Разобрать выбор в меню:
-            switch (wmId)
-            {
-            case IDM_ABOUT:
-                DialogBox(hInst, MAKEINTRESOURCE(IDD_ABOUTBOX), hWnd, About);
-                break;
-            case IDM_EXIT:
-                DestroyWindow(hWnd);
-                break;
-            default:
-                return DefWindowProc(hWnd, message, wParam, lParam);
-            }
+        case IDM_ABOUT:
+            DialogBox(hInst, MAKEINTRESOURCE(IDD_ABOUTBOX), hWnd, About);
+            break;
+        case IDM_EXIT:
+            DestroyWindow(hWnd);
+            break;
+        default:
+            return DefWindowProc(hWnd, message, wParam, lParam);
         }
-        break;
+    }
+    break;
     case WM_MOUSEMOVE:
     {
         //Наблюдатель поворачивает голову за мышью
-        units.units[0].directionOfSight = Point(LOWORD(lParam),  HIWORD(lParam));
+        units.units[0].directionOfSight = Point(LOWORD(lParam), HIWORD(lParam));
         units.units[0].FindNumberOfUnitsThatThisUnitSees(units.units);
+
         InvalidateRect(hWnd, NULL, FALSE);
     }
     break;
@@ -173,33 +174,36 @@ LRESULT CALLBACK WndProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam)
         uPainter.backSizeHeight = HIWORD(lParam);
     }
     case WM_PAINT:
-        {
+    {
         GetClientRect(hWnd, &Rect);
         hdc = BeginPaint(hWnd, &ps);
 
 
         // Создание теневого контекста для двойной буферизации
-        hCmpDC = CreateCompatibleDC(hdc);
-        hBmp = CreateCompatibleBitmap(hdc, Rect.right - Rect.left, Rect.bottom - Rect.top);
-        SelectObject(hCmpDC, hBmp);
+        {
+            hCmpDC = CreateCompatibleDC(hdc);
+            hBmp = CreateCompatibleBitmap(hdc, Rect.right - Rect.left, Rect.bottom - Rect.top);
+            SelectObject(hCmpDC, hBmp);
+        }
 
-            
 
-            uPainter.ClearBackground(hCmpDC);
+        uPainter.ClearBackground(hCmpDC);
 
-            uPainter.DrawVisibleUnitsForUnit(hCmpDC, 0, &units.units);
-            uPainter.DrawUnit(hCmpDC, units.units[0]);
-            
-            // Копируем изображение из теневого контекста на экран
+        uPainter.DrawVisibleUnitsForUnit(hCmpDC, 0, &units.units);
+        uPainter.DrawUnit(hCmpDC, units.units[0]);
+
+        // Копируем изображение из теневого контекста на экран
+        {
             SetStretchBltMode(hdc, COLORONCOLOR);
             BitBlt(hdc, 0, 0, Rect.right - Rect.left, Rect.bottom - Rect.top,
                 hCmpDC, 0, 0, SRCCOPY);
             hCmpDC = NULL;
             hdc = NULL;
-
-            EndPaint(hWnd, &ps);
         }
-        break;
+
+        EndPaint(hWnd, &ps);
+    }
+    break;
     case WM_DESTROY:
         PostQuitMessage(0);
         break;

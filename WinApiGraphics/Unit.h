@@ -3,8 +3,8 @@
 #include <vector>
 #include <cstring>
 #include <string>
-#include <xmmintrin.h>
 
+const double PI = 3.141592653;
 
 /// <summary>
 /// Класс определяющий юнита.
@@ -34,7 +34,7 @@ public:
     /// Номера юнитов, которые видны этому юниту.
     /// </summary>
     std::vector<int> numbersUnitsInDirectionOfSight;
-    const double PI = 3.141592653;
+    
     /// <summary>
     /// Половина угла обзора в радианах.
     /// По умолчанию: (135.5/2) * (PI / 180)
@@ -48,6 +48,54 @@ public:
 #pragma region Вычисление видимости
 
 private:
+
+    bool AreClockwise(Point p1, Point p2)
+    {
+        return (-p1.x * p2.y + p1.y * p2.x) > 0;
+    }
+    /// <summary>
+    /// Перемещение точки по окружности.
+    /// </summary>
+    /// <param name="point"></param>
+    /// <param name="angle">Угол в радианах.</param>
+    /// <param name="radius"></param>
+    /// <returns></returns>
+    Point RotatePointOnCircle(Point point, double angle)
+    {
+        Point rotatePoint;
+        rotatePoint.x = this->radius * cos(angle);
+        rotatePoint.y = this->radius * sin(angle);
+        return rotatePoint;
+    }
+    bool isInsideSector(Point positionUnit, Point shiftDirectionOfSight)
+    {
+
+        //Посчитать sectorStart и sectorEnd
+        Point sectorStart = RotatePointOnCircle(shiftDirectionOfSight, this->halfOfVisionAngleInRadians);
+        Point sectorEnd = RotatePointOnCircle(shiftDirectionOfSight, -this->halfOfVisionAngleInRadians);
+
+        return !AreClockwise(sectorStart, positionUnit) &&
+            AreClockwise(sectorEnd, positionUnit);
+    }
+
+    /// <summary>
+    /// Проверить, что точки находятся в одной четверти.
+    /// </summary>
+    /// <param name="firstPoint"></param>
+    /// <param name="secondPoint"></param>
+    /// <returns>true, если они в одной четверти.</returns>
+    bool DotsInOneQuarter(Point firstPoint, Point secondPoint)
+    {
+        bool isBothHigherOrLowerThanX = false;
+        if ((firstPoint.x >= 0 && secondPoint.x >= 0) ||
+            (firstPoint.x <= 0 && secondPoint.x <= 0))
+            isBothHigherOrLowerThanX = true;
+        bool isBothHigherOrLowerThanY = false;
+        if ((firstPoint.y >= 0 && secondPoint.y >= 0) ||
+            (firstPoint.y <= 0 && secondPoint.y <= 0))
+            isBothHigherOrLowerThanY = true;
+        return isBothHigherOrLowerThanX & isBothHigherOrLowerThanY;
+    }
     /// <summary>
 /// Проверить, находится ли юнит в поле зрения.
 /// </summary>
@@ -61,28 +109,28 @@ private:
         Point shiftDirectionOfSight = Point(this->directionOfSight.x - shiftX, this->directionOfSight.y - shiftY);
         Point shiftPositionUnit = Point(positionUnit.x - shiftX, positionUnit.y - shiftY);
 
-
+        /*
         //Если позиция юнита "за спиной" у смотрящего.
-        // Позиции не могут быть далеко длпруг от друга из-за ограниченности дальности видимости.
+        // Позиции не могут быть далеко друг от друга из-за ограниченности дальности видимости.
         // Потому можно перемножать и не боться переполнения.
-        if ((shiftDirectionOfSight.x * shiftPositionUnit.x < 0) &&
-            (shiftDirectionOfSight.y * shiftPositionUnit.y < 0))
+        if ((shiftDirectionOfSight.x * shiftPositionUnit.x < 0) && (shiftDirectionOfSight.y * shiftPositionUnit.y < 0) ||
+            (shiftDirectionOfSight.x * shiftPositionUnit.x == 0) && (shiftDirectionOfSight.y * shiftPositionUnit.y < 0) ||
+            (shiftDirectionOfSight.x * shiftPositionUnit.x < 0) && (shiftDirectionOfSight.y * shiftPositionUnit.y == 0))
         {
             return false;
         }
         //найти в радианах соответствующие углы зрению и метоположению
         double angleOfView = atan(shiftDirectionOfSight.y / shiftDirectionOfSight.x);
-        double angleOfVectorToUnit = atan(shiftPositionUnit.y / shiftPositionUnit.x);
+        double angleOfVectorToUnit = atan(shiftPositionUnit.y / shiftPositionUnit.x);*/
 
         //Если разница между углом зрения и местоположением меньше половины угла обзора, то юнит видно.
-        if (abs(angleOfView - angleOfVectorToUnit) < this->halfOfVisionAngleInRadians)
+        if (isInsideSector(shiftPositionUnit, shiftDirectionOfSight))
         {
             return true;
         }
-        else
-        {
-            return false;
-        }
+
+        //Если мы уже тут, то не видно юнита.
+        return false;
     }
     /// <summary>
     /// Проверить находится ли юнит в пределах коружности или на ее границе.
