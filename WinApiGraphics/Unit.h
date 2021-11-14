@@ -3,7 +3,7 @@
 #include <vector>
 #include <cstring>
 #include <string>
-#include <xmmintrin.h>
+#include <math.h>
 
 
 /// <summary>
@@ -61,6 +61,12 @@ private:
         Point shiftDirectionOfSight = Point(this->directionOfSight.x - shiftX, this->directionOfSight.y - shiftY);
         Point shiftPositionUnit = Point(positionUnit.x - shiftX, positionUnit.y - shiftY);
 
+        // Т.к. atan2 работает с пи по -пи, то по абсцисс можно отразить координаты.
+        if (shiftPositionUnit.x < 0)
+        {
+            shiftPositionUnit.x *= -1;
+            shiftDirectionOfSight.x *= -1;
+        }
 
         //Если позиция юнита "за спиной" у смотрящего.
         // Позиции не могут быть далеко длпруг от друга из-за ограниченности дальности видимости.
@@ -71,8 +77,8 @@ private:
             return false;
         }
         //найти в радианах соответствующие углы зрению и метоположению
-        double angleOfView = atan(shiftDirectionOfSight.y / shiftDirectionOfSight.x);
-        double angleOfVectorToUnit = atan(shiftPositionUnit.y / shiftPositionUnit.x);
+        double angleOfView = atan2(shiftDirectionOfSight.y , shiftDirectionOfSight.x);
+        double angleOfVectorToUnit = atan2(shiftPositionUnit.y , shiftPositionUnit.x);
 
         //Если разница между углом зрения и местоположением меньше половины угла обзора, то юнит видно.
         if (abs(angleOfView - angleOfVectorToUnit) < this->halfOfVisionAngleInRadians)
