@@ -5,6 +5,7 @@
 #include <string>
 #include <math.h>
 
+const double PI = 3.141592653;
 
 /// <summary>
 /// Класс определяющий юнита.
@@ -34,7 +35,6 @@ public:
     /// Номера юнитов, которые видны этому юниту.
     /// </summary>
     std::vector<int> numbersUnitsInDirectionOfSight;
-    const double PI = 3.141592653;
     /// <summary>
     /// Половина угла обзора в радианах.
     /// По умолчанию: (135.5/2) * (PI / 180)
