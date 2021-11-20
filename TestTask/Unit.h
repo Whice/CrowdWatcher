@@ -129,7 +129,7 @@ public:
     /// <returns></returns>
     inline bool UnitIsVisible(Point positionUnit)
     {
-        return  IsInsideCircle(positionUnit) &IsUnitInSight(positionUnit);
+        return  IsInsideCircle(positionUnit) & IsUnitInSight(positionUnit);
     }
     /// <summary>
     /// Узнать номера юнитов, которых видит этот юнит.

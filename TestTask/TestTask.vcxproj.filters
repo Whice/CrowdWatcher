@@ -15,7 +15,7 @@
     </Filter>
   </ItemGroup>
   <ItemGroup>
-    <ClCompile Include="TestTask.cpp">
+    <ClCompile Include="CrowdWatcher.cpp">
       <Filter>Исходные файлы</Filter>
     </ClCompile>
   </ItemGroup>

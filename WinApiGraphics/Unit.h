@@ -77,8 +77,8 @@ private:
             return false;
         }
         //найти в радианах соответствующие углы зрению и метоположению
-        double angleOfView = atan2(shiftDirectionOfSight.y , shiftDirectionOfSight.x);
-        double angleOfVectorToUnit = atan2(shiftPositionUnit.y , shiftPositionUnit.x);
+        double angleOfView = atan2(shiftDirectionOfSight.y, shiftDirectionOfSight.x);
+        double angleOfVectorToUnit = atan2(shiftPositionUnit.y, shiftPositionUnit.x);
 
         //Если разница между углом зрения и местоположением меньше половины угла обзора, то юнит видно.
         if (abs(angleOfView - angleOfVectorToUnit) < this->halfOfVisionAngleInRadians)
@@ -129,9 +129,7 @@ public:
     /// <returns></returns>
     inline bool UnitIsVisible(Point positionUnit)
     {
-        bool sight = IsUnitInSight(positionUnit);
-        bool inCircle = IsInsideCircle(positionUnit);
-        return  sight & inCircle;
+        return  IsInsideCircle(positionUnit) & IsUnitInSight(positionUnit);
     }
     /// <summary>
     /// Узнать номера юнитов, которых видит этот юнит.
