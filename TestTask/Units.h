@@ -50,7 +50,7 @@ private: int countOfUnits;
 /// Размер ячейки на карте для определения области, в которой может быть юнит.
 /// Размер ячейки должен быть больше дальности обзора, т.к. иначе деления на ячейки не имеет смысла.
 /// </summary>
-private: static const int MAP_CELL_SIZE = Unit::SIGHT_DISTANCE*5;
+private: static const int MAP_CELL_SIZE = Unit::SIGHT_DISTANCE*2;
 /// <summary>
 /// Карта содержащая ячейки, в которых храняться юниты.
 /// Юниты распределены по ячейкам в зависимости от своего местоположения.
@@ -92,7 +92,7 @@ private: inline Point GetCellForUnit(const Point &unitPosition)
 /// </summary>
 /// <param name="cellPosition"></param>
 /// <returns></returns>
-private: vector<Unit> GetUnitsForCellAndHerNeighbors(const Point &cellPosition)
+private: void GetUnitsForCellAndHerNeighbors(const Point &cellPosition, vector<Unit> &neighborsForCell)
 {
     Point keyCells[] =//получить позиции всех соседних ячеек и самой указанной ячейки.
     {
@@ -109,27 +109,24 @@ private: vector<Unit> GetUnitsForCellAndHerNeighbors(const Point &cellPosition)
         Point(cellPosition.x - 1, cellPosition.y + 1),
     };
 
-    set<Unit> neighborsForCellSet;
+    set<Unit*> neighborsForCellSet;
+    neighborsForCell = vector<Unit>();
+    vector<Unit> *unitsInCell;
     Point key;
     for (int i = 0; i < 9; i++)
     {
         key = keyCells[i];
-        vector<Unit> unitsInCell = this->cellsWithUnits[key];
-        auto end = (unitsInCell).end();
-        for (auto it = (unitsInCell).begin(); it != end; ++it)
+        unitsInCell = &this->cellsWithUnits[key];
+        auto end = (*unitsInCell).end();
+        for (auto it = (*unitsInCell).begin(); it != end; ++it)
         {
-            neighborsForCellSet.insert(*it);
+            if (neighborsForCellSet.count(&( * it)) == 0)
+            {
+                neighborsForCellSet.insert(&(*it));
+                neighborsForCell.push_back(*it);
+            }
         }
     }
-
-    vector<Unit> neighborsForCell = vector<Unit>();
-    auto end = (neighborsForCellSet).end();
-    for (auto it = (neighborsForCellSet).begin(); it != end; ++it)
-    {
-        neighborsForCell.push_back(*it);
-    }
-
-    return neighborsForCell;
 }
     /// <summary>
     /// Разместить юнитов на карте.
@@ -208,7 +205,7 @@ public:
         for (auto it = (*units).begin(); it != end; ++it)
         {
             Point p = GetCellForUnit((*it).location);
-            neighbors = GetUnitsForCellAndHerNeighbors(p);
+            GetUnitsForCellAndHerNeighbors(p, neighbors);
             (*it).FindCountOfUnitsThatThisUnitSees(neighbors);
         }
     }

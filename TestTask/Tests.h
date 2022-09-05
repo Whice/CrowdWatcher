@@ -22,17 +22,16 @@ public:
 /// <summary>
 /// Запустить все тесты на скорость.
 /// </summary>
-void StartAllSpeedTests()
-{
-	SpeedTest(9);
-	SpeedTestParallel(9);
-	SpeedTest(99);
-	SpeedTestParallel(99);
-	SpeedTest(999);
-	SpeedTestParallel(999);
-	SpeedTest(9'999);
-	SpeedTestParallel(9'999);
-}
+	void StartAllSpeedTests()
+	{
+		for (int i = 1; i < 7; i++)
+		{
+			int countUnits = (int)pow(10, i);
+			SpeedTest(countUnits);
+			SpeedTestWithMap(countUnits);
+			SpeedTestParallel(countUnits);
+		}
+	}
 
 private:
 	double  spreadOfValues = 3000;
@@ -45,6 +44,30 @@ void SpeedTest(int countOfUnits)
 	const int countOfRepeats = this->countOfRepeats;
 
 	cout << "Количество юнитов: " << countOfUnits << endl;
+
+	this->manyUnits = Units(countOfUnits);
+
+	//Запомнить время запуска.
+	auto start = system_clock::now();
+
+	for(int i=0;i<countOfRepeats;++i)
+		this->manyUnits.CalculateVisionForAllUnits();
+
+	auto end = system_clock::now();
+	std::cout << "Выполнение заняло: " << ((duration<double>)(end - start)).count() << "\n\n";
+}
+/// <summary>
+/// Запустить тест на скорость, с определенным количеством юнитов.
+/// Запуск с учетом размещения юнитов на карте в ячейки.
+/// /// </summary>
+/// <param name="countOfUnits"></param>
+void SpeedTestWithMap(int countOfUnits)
+{
+	const int countOfRepeats = this->countOfRepeats;
+
+	cout << "Количество юнитов (с картой и ячейками): " << countOfUnits << endl;
+
+	this->manyUnits = Units(countOfUnits);
 
 	//Запомнить время запуска.
 	auto start = system_clock::now();

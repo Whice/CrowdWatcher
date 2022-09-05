@@ -19,7 +19,7 @@ int main()
     //Тесты скорости
     test.StartAllSpeedTests();
     //Тесты сохранения и загрузки
-    //test.StartAllSaveAndLoadTests();
+    test.StartAllSaveAndLoadTests();
     
     return _getch();
 }
