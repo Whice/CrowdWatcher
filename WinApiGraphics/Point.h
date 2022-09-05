@@ -18,5 +18,40 @@ public: Point(double x, double y)
 }
       double x;
       double y;
-};
 
+public:
+    inline
+        bool operator<(const Point& other) const
+    {
+        if (this->x == other.x)
+        {
+            return this->y < other.y;
+        }
+        else
+        {
+            return this->x < other.x;
+        }
+    }
+    inline
+        bool operator>(const Point& other) const
+    {
+        if (this->x == other.x)
+        {
+            return this->y > other.y;
+        }
+        else
+        {
+            return this->x > other.x;
+        }
+    }
+    inline
+        bool operator==(const Point& other) const
+    {
+        return this->x == other.x && this->y == other.y;
+    }
+    inline
+        bool operator!=(const Point& other) const
+    {
+        return this->x != other.x || this->y != other.y;
+    }
+};

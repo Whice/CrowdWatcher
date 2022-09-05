@@ -19,7 +19,7 @@ public:
         auto end = this->units.end();
         for (auto it = this->units.begin(); it != end; ++it)
         {
-            (*it).radius = radius;
+            (*it).SIGHT_DISTANCE = radius;
         }
     }
 

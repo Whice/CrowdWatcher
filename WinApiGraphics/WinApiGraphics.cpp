@@ -162,7 +162,7 @@ LRESULT CALLBACK WndProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam)
     case WM_MOUSEMOVE:
     {
         //Наблюдатель поворачивает голову за мышью
-        units.units[0].directionOfSight = Point(LOWORD(lParam),  HIWORD(lParam));
+        units.units[0].SetDirectionOfSight(Point(LOWORD(lParam), HIWORD(lParam)));
         units.units[0].FindNumberOfUnitsThatThisUnitSees(units.units);
         InvalidateRect(hWnd, NULL, FALSE);
     }
