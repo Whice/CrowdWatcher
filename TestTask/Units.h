@@ -26,10 +26,10 @@ public:
     /// Список юнитов.
     /// </summary>
     vector<Unit> units;
-/// <summary>
-/// Получить всех юнитов с карты с ячейками.
-/// </summary>
-/// <returns></returns>
+    /// <summary>
+    /// Получить всех юнитов с карты с ячейками.
+    /// </summary>
+    /// <returns></returns>
 public: vector<Unit> GetUnitsFromMap()
 {
     vector<Unit> allUnits;
@@ -42,19 +42,19 @@ public: vector<Unit> GetUnitsFromMap()
     }
     return allUnits;
 }
-/// <summary>
-/// Количество всех юнитов.
-/// </summary>
+      /// <summary>
+      /// Количество всех юнитов.
+      /// </summary>
 private: int countOfUnits;
-/// <summary>
-/// Размер ячейки на карте для определения области, в которой может быть юнит.
-/// Размер ячейки должен быть больше дальности обзора, т.к. иначе деления на ячейки не имеет смысла.
-/// </summary>
-private: static const int MAP_CELL_SIZE = Unit::SIGHT_DISTANCE*2;
-/// <summary>
-/// Карта содержащая ячейки, в которых храняться юниты.
-/// Юниты распределены по ячейкам в зависимости от своего местоположения.
-/// </summary>
+       /// <summary>
+       /// Размер ячейки на карте для определения области, в которой может быть юнит.
+       /// Размер ячейки должен быть больше дальности обзора, т.к. иначе деления на ячейки не имеет смысла.
+       /// </summary>
+private: static const int MAP_CELL_SIZE = Unit::SIGHT_DISTANCE * 2;
+       /// <summary>
+       /// Карта содержащая ячейки, в которых храняться юниты.
+       /// Юниты распределены по ячейкам в зависимости от своего местоположения.
+       /// </summary>
 private: map<Point, vector<Unit>> cellsWithUnits;
 
 public:
@@ -68,31 +68,31 @@ public:
     {
         int countOfUnits = this->units.size();
         auto end = this->units.end();
-        for (auto it = this->units.begin(); it < end ; ++it)
+        for (auto it = this->units.begin(); it < end; ++it)
         {
             (*it).CalculateRandomLocation(min, max);
             (*it).CalculateRandomDirectionOfSight(min, max);
         }
     }
-/// <summary>
-/// Получить ячейку, в которой находиться юнит.
-/// </summary>
-/// <param name="unitPosition"></param>
-/// <returns></returns>
-private: inline Point GetCellForUnit(const Point &unitPosition)
+    /// <summary>
+    /// Получить ячейку, в которой находиться юнит.
+    /// </summary>
+    /// <param name="unitPosition"></param>
+    /// <returns></returns>
+private: inline Point GetCellForUnit(const Point& unitPosition)
 {
     return Point(//double туда запишутся после деления двух целых.
         (int)unitPosition.x / this->MAP_CELL_SIZE,
         (int)unitPosition.y / this->MAP_CELL_SIZE
     );
 }
-/// <summary>
-/// Получить всех юнитов из этой ячйки и ее соседей.
-/// Предполагается, что дальность видимости юнита меньше, чем размер ячейки.
-/// </summary>
-/// <param name="cellPosition"></param>
-/// <returns></returns>
-private: void GetUnitsForCellAndHerNeighbors(const Point &cellPosition, vector<Unit> &neighborsForCell)
+       /// <summary>
+       /// Получить всех юнитов из этой ячйки и ее соседей.
+       /// Предполагается, что дальность видимости юнита меньше, чем размер ячейки.
+       /// </summary>
+       /// <param name="cellPosition"></param>
+       /// <returns></returns>
+private: void GetUnitsForCellAndHerNeighbors(const Point& cellPosition, vector<Unit>& neighborsForCell)
 {
     Point keyCells[] =//получить позиции всех соседних ячеек и самой указанной ячейки.
     {
@@ -111,7 +111,7 @@ private: void GetUnitsForCellAndHerNeighbors(const Point &cellPosition, vector<U
 
     set<Unit*> neighborsForCellSet;
     neighborsForCell = vector<Unit>();
-    vector<Unit> *unitsInCell;
+    vector<Unit>* unitsInCell;
     Point key;
     for (int i = 0; i < 9; i++)
     {
@@ -120,7 +120,7 @@ private: void GetUnitsForCellAndHerNeighbors(const Point &cellPosition, vector<U
         auto end = (*unitsInCell).end();
         for (auto it = (*unitsInCell).begin(); it != end; ++it)
         {
-            if (neighborsForCellSet.count(&( * it)) == 0)
+            if (neighborsForCellSet.count(&(*it)) == 0)
             {
                 neighborsForCellSet.insert(&(*it));
                 neighborsForCell.push_back(*it);
@@ -128,56 +128,56 @@ private: void GetUnitsForCellAndHerNeighbors(const Point &cellPosition, vector<U
         }
     }
 }
-    /// <summary>
-    /// Разместить юнитов на карте.
-    /// Размещение равномерное, для тестов.
-    /// </summary>
+       /// <summary>
+       /// Разместить юнитов на карте.
+       /// Размещение равномерное, для тестов.
+       /// </summary>
 private: void PlaceUnitsOnMap()
-    {
-        const int countOfUnits = this->countOfUnits;
-        int unitsCountHave = 0;
-        const int mapCellSize = this->MAP_CELL_SIZE;
-        //расстояние размещения друг от друга
-        int distanceBeetwenUnits = 1;
-        //Определить стартовую точку заполнения при единичном расстоянии между юнитами
-        int step = 0;//Это шаг в сторону от любой из осей.
-        while ((2 * step + 1) * (2 * step + 1) < countOfUnits)
-            ++step;
-        //Точка начала по х 
-        const int xStart = step * distanceBeetwenUnits;
-        //Точка начала по у
-        const int yStart = step * distanceBeetwenUnits;
-        //Точка конца по х 
-        const int xEnd = -step * distanceBeetwenUnits;
-        //Точка конца по у
-        const int yEnd = -step * distanceBeetwenUnits;
+{
+    const int countOfUnits = this->countOfUnits;
+    int unitsCountHave = 0;
+    const int mapCellSize = this->MAP_CELL_SIZE;
+    //расстояние размещения друг от друга
+    int distanceBeetwenUnits = 1;
+    //Определить стартовую точку заполнения при единичном расстоянии между юнитами
+    int step = 0;//Это шаг в сторону от любой из осей.
+    while ((2 * step + 1) * (2 * step + 1) < countOfUnits)
+        ++step;
+    //Точка начала по х 
+    const int xStart = step * distanceBeetwenUnits;
+    //Точка начала по у
+    const int yStart = step * distanceBeetwenUnits;
+    //Точка конца по х 
+    const int xEnd = -step * distanceBeetwenUnits;
+    //Точка конца по у
+    const int yEnd = -step * distanceBeetwenUnits;
 
-        for (int x = xStart; x >= xEnd; x -= distanceBeetwenUnits)
-            for (int y = yStart; y >= yEnd; y -= distanceBeetwenUnits)
+    for (int x = xStart; x >= xEnd; x -= distanceBeetwenUnits)
+        for (int y = yStart; y >= yEnd; y -= distanceBeetwenUnits)
+        {
+            Point position = Point(x, y);
+            /*раздать как будто случайные направления взглядов.
+            Так они не будут смотреть в одну сторону, но всегда одинаково.*/
+            Point directionOfSight = Point
+            (
+                (int)position.x % 2 == 0 ? position.x - 1 : position.x - 1,
+                (int)position.y % 2 == 0 ? position.y - 1 : position.y - 1
+            );
+            Unit u = Unit(position, directionOfSight);
+
+            Point cellPosition = GetCellForUnit(position);
+            if (this->cellsWithUnits.count(cellPosition) == 0)
             {
-                Point position = Point(x, y);
-                Unit u = Unit();
-                u.location = position;
-                /*раздать как будто случайные направления взглядов.
-                Так они не будут смотреть в одну сторону, но всегда одинково.*/
-                u.directionOfSight = Point
-                (
-                    (int)position.x % 2 == 0 ? position.x - 1 : position.x - 1,
-                    (int)position.y % 2 == 0 ? position.y - 1 : position.y - 1
-                );
-                Point cellPosition = GetCellForUnit(position);
-                if (this->cellsWithUnits.count(cellPosition)==0)
-                {
-                    this->cellsWithUnits[cellPosition] = vector<Unit>();
-                }
-                this->cellsWithUnits[cellPosition].push_back(u);
-                this->units.push_back(u);
-
-                ++unitsCountHave;
-                if (unitsCountHave >= countOfUnits)
-                    return;
+                this->cellsWithUnits[cellPosition] = vector<Unit>();
             }
-    }
+            this->cellsWithUnits[cellPosition].push_back(u);
+            this->units.push_back(u);
+
+            ++unitsCountHave;
+            if (unitsCountHave >= countOfUnits)
+                return;
+        }
+}
 public:
     /// <summary>
     /// Узнать кого видит каждый из юнитов в списке.
@@ -222,7 +222,7 @@ public:
 
         for (int i = 0; i < processorCount; ++i)
         {
-            treads[i] = thread([i, processorCount, units]() 
+            treads[i] = thread([i, processorCount, units]()
                 {
                     Units::PerfromCircleCalculateVisionForAllUnitsParallel(i, processorCount, units);
                 });
@@ -239,15 +239,15 @@ public:
     /// <param name="threadNumber">Номер потока выполнения.</param>
     /// <param name="processorCount">Общее количество потоков, на которых идет выполнение.</param>
     /// <param name="units">Список юнитов.</param>
-    static void PerfromCircleCalculateVisionForAllUnitsParallel(int threadNumber, const uint16_t processorCount, vector<Unit>*units)
+    static void PerfromCircleCalculateVisionForAllUnitsParallel(int threadNumber, const uint16_t processorCount, vector<Unit>* units)
     {
         int countOfUnits = (*units).size();
 
         int startNumber = threadNumber * countOfUnits / processorCount;
-        int endNumer = (threadNumber +1)* countOfUnits / processorCount;
+        int endNumer = (threadNumber + 1) * countOfUnits / processorCount;
 
         auto start = (*units).begin() + startNumber;
-        auto end = (*units).begin()+endNumer;
+        auto end = (*units).begin() + endNumer;
         for (auto it = start; it != end; ++it)
         {
             (*it).FindCountOfUnitsThatThisUnitSees((*units));
@@ -271,11 +271,11 @@ public:
         getline(in, stringLine);
         do
         {
-            
+
             /* "Unit number " << i << ": " +"location: " + to_string(this->location.x) + ";" + to_string(this->location.y) + "; "
             + "directionOfSight: " + to_string(this->directionOfSight.x) + ";" + to_string(this->directionOfSight.y) + "; "
             + "numbersUnitsInDirectionOfSight: ";*/
-            
+
             stringLine = stringLine.erase(0, stringLine.find("n: ") + 3);
             token = stringLine.substr(0, stringLine.find(";"));
             Unit unit;
@@ -303,8 +303,7 @@ public:
             this->units.push_back(unit);
 
             getline(in, stringLine);
-        } 
-        while (stringLine != "");
+        } while (stringLine != "");
 
         in.close();
     }
@@ -319,7 +318,7 @@ public:
         int size = this->units.size();
         for (int i = 0; i < size; ++i)
         {
-            out << "Unit number " << i << ": " << this->units[i].ToString()<<endl;
+            out << "Unit number " << i << ": " << this->units[i].ToString() << endl;
         }
 
         out.close();

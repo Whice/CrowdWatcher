@@ -29,6 +29,10 @@ public:
 		y *= value;
 		return *this;
 	}
+	inline Vector2 operator*(double value)
+	{
+		return Vector2(this->x * value, this->y * value);
+	}
 	inline Vector2 operator+(Vector2 value)
 	{
 		return Vector2(this->x + value.x, this->y + value.y);
@@ -37,7 +41,14 @@ public:
 	{
 		return Vector2(this->x - value.x, this->y - value.y);
 	}
-
+	/// <summary>
+	/// Меняет знаки для x и y на противоположные.
+	/// </summary>
+	inline void Negative()
+	{
+		this->x *= -1;
+		this->y *= -1;
+	}
 #pragma endregion Операции.
 
 public:
@@ -97,8 +108,9 @@ public:
 	inline Vector2& Normalize()
 	{
 		double length = Length();
-		x *= length;
-		y *= length;
+		double rLength = length != 0 ? 1 / length : 0;
+		x *= rLength;
+		y *= rLength;
 		return *this;
 	}
 
@@ -107,12 +119,16 @@ public:
 	{
 		return this->x * otherVector.x + this->y * otherVector.y;
 	}
+	inline double Skew(Vector2 otherVector)
+	{
+		return this->x * otherVector.y - this->y * otherVector.x;
+	}
 	/// <summary>
 	/// Получить угол в радианах между этим вектором и указанным.
 	/// </summary>
 	/// <param name="therVector"></param>
 	/// <returns></returns>
-	inline double GetAngleRadWith(const Vector2 &otherVector)
+	inline double GetAngleRadWith(const Vector2& otherVector)
 	{
 		return acos(Dot(otherVector) / (Length() * otherVector.Length()));
 	}
@@ -123,7 +139,7 @@ public:
 	/// <returns>Вернет 1, если направлены в одну сторону. 
 	/// Вернет 0, если перпендикулярны.
 	/// Вернет -1, если в разные стороны направлены.</returns>
-	inline int SameDirectionWith(const Vector2 &otherVector)
+	inline int SameDirectionWith(const Vector2& otherVector)
 	{
 		double dot = Dot(otherVector);
 		if (dot > 0)
@@ -132,5 +148,23 @@ public:
 			return -1;
 		return 0;
 	}
-};
+	/// <summary>
+	/// Осуществить вращение через комплексное число.
+	/// </summary>
+	/// <param name="a">Действительная часть.</param>
+	/// <param name="b">Мнимая часть.</param>
+	/// <returns></returns>
+	inline void RotateWithComplex(double a, double b)
+	{
+		double x = this->x;
+		double y = this->y;
+		this->x = x * a - y * b;
+		this->y = x * b + y * a;
+	}
 
+public:
+	inline std::string ToString()
+	{
+		return "X: " + std::to_string(this->x) + "; Y: " + std::to_string(this->y) + ";";
+	}
+};
