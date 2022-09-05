@@ -13,14 +13,13 @@ int main()
 {
 
     setlocale(LC_ALL, "");
-
+    
     //Создать тестовый объект
     Tests test;
     //Тесты скорости
     test.StartAllSpeedTests();
     //Тесты сохранения и загрузки
     test.StartAllSaveAndLoadTests();
-
-    _getch();
-    return 0;
+    
+    return _getch();
 }

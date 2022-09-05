@@ -47,13 +47,13 @@ void SpeedTest(int countOfUnits)
 	cout << "Количество юнитов: " << countOfUnits << endl;
 
 	this->manyUnits = Units(countOfUnits);
-	this->manyUnits.SetRandomParametrsForAllUnits(-this->spreadOfValues, this->spreadOfValues);
+	this->manyUnits.units.
 
 	//Запомнить время запуска.
 	auto start = system_clock::now();
 
 	for(int i=0;i<countOfRepeats;++i)
-		this->manyUnits.CalculateVisionForAllUnits();
+		this->manyUnits.CalculateVisionForAllUnitsWithMapCells();
 
 	auto end = system_clock::now();
 	std::cout << "Выполнение заняло: " << ((duration<double>)(end - start)).count() << "\n\n";
@@ -69,7 +69,6 @@ void SpeedTestParallel(int countOfUnits)
 	cout << "Количество юнитов(параллельный код): " << countOfUnits << endl;
 
 	this->manyUnits = Units(countOfUnits);
-	this->manyUnits.SetRandomParametrsForAllUnits(-this->spreadOfValues, this->spreadOfValues);
 
 	//Запомнить время запуска.
 	auto start = system_clock::now();

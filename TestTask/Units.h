@@ -3,6 +3,7 @@
 #include <fstream>
 #include <cstring>
 #include <thread>
+#include <map>
 
 using namespace std;
 
@@ -16,6 +17,8 @@ public:
     Units(int countOfUnits = 10)
     {
         this->units = vector<Unit>(countOfUnits);
+        this->countOfUnits = countOfUnits;
+        PlaceUnitsOnMap();
     }
 
 public:
@@ -23,6 +26,29 @@ public:
     /// Список юнитов.
     /// </summary>
     vector<Unit> units;
+public: vector<Unit> GetUnitsFromMap()
+{
+    vector<Unit> allUnits;
+    for (auto cell : this->cellsWithUnits)
+    {
+        for (auto unit : cell.second)
+        {
+            allUnits.push_back(unit);
+        }
+    }
+    return allUnits;
+}
+private: int countOfUnits;
+/// <summary>
+/// Размер ячейки на карте для определения области, в которой может быть юнит.
+/// Размер ячейки должен быть больше дальности обзора, т.к. иначе деления на ячейки не имеет смысла.
+/// </summary>
+private: static const int MAP_CELL_SIZE = Unit::SIGHT_DISTANCE*5;
+/// <summary>
+/// Карта содержащая ячейки, в которых храняться юниты.
+/// Юниты распределены по ячейкам в зависимости от своего местоположения.
+/// </summary>
+private: map<Point, vector<Unit>> cellsWithUnits;
 
 public:
     /// <summary>
@@ -41,6 +67,102 @@ public:
             (*it).CalculateRandomDirectionOfSight(min, max);
         }
     }
+/// <summary>
+/// Получить ячейку, в которой находиться юнит.
+/// </summary>
+/// <param name="unitPosition"></param>
+/// <returns></returns>
+private: inline Point GetCellForUnit(const Point &unitPosition)
+{
+    return Point(//double туда запишутся после деления двух целых.
+        unitPosition.x / this->MAP_CELL_SIZE,
+        unitPosition.y / this->MAP_CELL_SIZE
+    );
+}
+/// <summary>
+/// Получить всех юнитов из этой ячйки и ее соседей.
+/// Предполагается, что дальность видимости юнита меньше, чем размер ячейки.
+/// </summary>
+/// <param name="cellPosition"></param>
+/// <returns></returns>
+private: vector<Unit> GetUnitsForCellAndHerNeighbors(const Point &cellPosition)
+{
+    vector<Unit> neighborsForCell = vector<Unit>();
+    Point keyCells[] =//получить позиции всех соседних ячеек и самой указанной ячейки.
+    {
+        Point(cellPosition.x, cellPosition.y),
+        Point(cellPosition.x + 1, cellPosition.y),
+        Point(cellPosition.x - 1, cellPosition.y),
+
+        Point(cellPosition.x, cellPosition.y - 1),
+        Point(cellPosition.x + 1, cellPosition.y - 1),
+        Point(cellPosition.x - 1, cellPosition.y - 1),
+
+        Point(cellPosition.x, cellPosition.y + 1),
+        Point(cellPosition.x + 1, cellPosition.y + 1),
+        Point(cellPosition.x - 1, cellPosition.y + 1),
+    };
+
+    Point key;
+    for (int i = 0; i < 9; i++)
+    {
+        key = keyCells[i];
+        vector<Unit> unitsInCell = this->cellsWithUnits[key];
+        auto end = (unitsInCell).end();
+        for (auto it = (unitsInCell).begin(); it != end; ++it)
+        {
+            neighborsForCell.push_back(*it);
+        }
+    }
+
+    return neighborsForCell;
+}
+    /// <summary>
+    /// Разместить юнитов на карте.
+    /// Размещение равномерное, для тестов.
+    /// </summary>
+private: void PlaceUnitsOnMap()
+    {
+        const int countOfUnits = this->countOfUnits;
+        const int mapCellSize = this->MAP_CELL_SIZE;
+        //расстояние размещения друг от друга
+        int distanceBeetwenUnits = 1;
+        //Определить стартовую точку заполнения при единичном расстоянии между юнитами
+        int step = 0;//Это шаг в сторону от любой из осей.
+        while ((2 * step + 1) * (2 * step + 1) < countOfUnits)
+            ++step;
+        //Точка начала по х 
+        const int xStart = step * distanceBeetwenUnits;
+        //Точка начала по у
+        const int yStart = step * distanceBeetwenUnits;
+        //Точка конца по х 
+        const int xEnd = -step * distanceBeetwenUnits;
+        //Точка конца по у
+        const int yEnd = -step * distanceBeetwenUnits;
+
+        for (int x = xStart; x < xEnd; x += distanceBeetwenUnits)
+            for (int y = yStart; y < yEnd; y += distanceBeetwenUnits)
+            {
+                Point position = Point(x, y);
+                Unit u = Unit();
+                u.location = position;
+                /*раздать как будто случайные направления взглядов.
+                Так они не будут смотреть в одну сторону, но всегда одинково.*/
+                u.directionOfSight = Point
+                (
+                    (int)position.x % 2 == 0 ? position.x - 1 : position.x - 1,
+                    (int)position.y % 2 == 0 ? position.y - 1 : position.y - 1
+                );
+                Point cellPosition = GetCellForUnit(position);
+                if (this->cellsWithUnits.count(cellPosition)==0)
+                {
+                    this->cellsWithUnits[cellPosition] = vector<Unit>();
+                }
+                this->cellsWithUnits[cellPosition].push_back(u);
+                this->units.push_back(u);
+            }
+    }
+public:
     /// <summary>
     /// Узнать кого видит каждый из юнитов в списке.
     /// </summary>
@@ -52,6 +174,22 @@ public:
         for (auto it = (*units).begin(); it != end; ++it)
         {
             (*it).FindNumberOfUnitsThatThisUnitSees((*units));
+        }
+    }
+    /// <summary>
+    /// Узнать кого видит каждый из юнитов в списке с 
+    /// использованием ячеек карты.
+    /// </summary>
+    void CalculateVisionForAllUnitsWithMapCells()
+    {
+        vector<Unit>* units = &this->units;
+        vector<Unit> neighbors;
+
+        auto end = (*units).end();
+        for (auto it = (*units).begin(); it != end; ++it)
+        {
+            neighbors = GetUnitsForCellAndHerNeighbors(GetCellForUnit((*it).location));
+            (*it).FindNumberOfUnitsThatThisUnitSees(neighbors);
         }
     }
     /// <summary>
@@ -67,7 +205,10 @@ public:
 
         for (int i = 0; i < processorCount; ++i)
         {
-            treads[i] = thread([i, processorCount, units]() { Units::PerfromCircleCalculateVisionForAllUnitsParallel(i, processorCount, units); });
+            treads[i] = thread([i, processorCount, units]() 
+                {
+                    Units::PerfromCircleCalculateVisionForAllUnitsParallel(i, processorCount, units);
+                });
         }
         for (int i = 0; i < processorCount; ++i)
         {

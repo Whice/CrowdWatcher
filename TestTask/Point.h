@@ -18,5 +18,12 @@ public: Point(double x, double y)
 }
       double x;
       double y;
+
+public:
+    inline
+    bool operator<(const Point& other) const
+    {
+        return this->x + this->y < other.x + other.y;
+    }
 };
 

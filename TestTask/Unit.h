@@ -43,7 +43,7 @@ public:
     /// <summary>
     /// Радиус - дальность обзора.
     /// </summary>
-    double radius = 2;
+public:static const int SIGHT_DISTANCE = 2;
 
 #pragma region Вычисление видимости
 
@@ -99,7 +99,7 @@ private:
     {
         double deltaX = positionUnit.x - this->location.x;
         double deltaY = positionUnit.y - this->location.y;
-        const double radius = this->radius;
+        const double radius = this->SIGHT_DISTANCE;
 
         //Если они стоят в одной точке, то они не могут друг друга видеть.
         if (!(deltaX + deltaY))
@@ -129,7 +129,22 @@ public:
     /// <returns></returns>
     inline bool UnitIsVisible(Point positionUnit)
     {
-        return  IsInsideCircle(positionUnit) & IsUnitInSight(positionUnit);
+        return  IsInsideCircle(positionUnit) && IsUnitInSight(positionUnit);
+    }
+    /// <summary>
+    /// Узнать количество юнитов, которых видит этот юнит.
+    /// </summary>
+    /// <param name="listOfUnits"></param>
+    void FindCountOfUnitsThatThisUnitSees(std::vector<Unit>& listOfUnits)
+    {
+        int countVisibleUnits = 0;
+        const int countOfUnits = listOfUnits.size();
+        for (int i = 0; i < countOfUnits; ++i)
+        {
+            if (this->UnitIsVisible(listOfUnits[i].location))
+            {
+            }
+        }
     }
     /// <summary>
     /// Узнать номера юнитов, которых видит этот юнит.
@@ -214,6 +229,11 @@ public:
         }
 
         return returnString;
+    }
+    inline
+    bool operator<(const Unit &other) const
+    {
+        return this->location < other.location;
     }
 
 };
