@@ -46,9 +46,6 @@ void SpeedTest(int countOfUnits)
 
 	cout << "Количество юнитов: " << countOfUnits << endl;
 
-	this->manyUnits = Units(countOfUnits);
-	this->manyUnits.units.
-
 	//Запомнить время запуска.
 	auto start = system_clock::now();
 

@@ -4,6 +4,7 @@
 #include <cstring>
 #include <thread>
 #include <map>
+#include <set>
 
 using namespace std;
 
@@ -16,7 +17,6 @@ class Units
 public:
     Units(int countOfUnits = 10)
     {
-        this->units = vector<Unit>(countOfUnits);
         this->countOfUnits = countOfUnits;
         PlaceUnitsOnMap();
     }
@@ -26,6 +26,10 @@ public:
     /// Список юнитов.
     /// </summary>
     vector<Unit> units;
+/// <summary>
+/// Получить всех юнитов с карты с ячейками.
+/// </summary>
+/// <returns></returns>
 public: vector<Unit> GetUnitsFromMap()
 {
     vector<Unit> allUnits;
@@ -38,6 +42,9 @@ public: vector<Unit> GetUnitsFromMap()
     }
     return allUnits;
 }
+/// <summary>
+/// Количество всех юнитов.
+/// </summary>
 private: int countOfUnits;
 /// <summary>
 /// Размер ячейки на карте для определения области, в которой может быть юнит.
@@ -75,8 +82,8 @@ public:
 private: inline Point GetCellForUnit(const Point &unitPosition)
 {
     return Point(//double туда запишутся после деления двух целых.
-        unitPosition.x / this->MAP_CELL_SIZE,
-        unitPosition.y / this->MAP_CELL_SIZE
+        (int)unitPosition.x / this->MAP_CELL_SIZE,
+        (int)unitPosition.y / this->MAP_CELL_SIZE
     );
 }
 /// <summary>
@@ -87,7 +94,6 @@ private: inline Point GetCellForUnit(const Point &unitPosition)
 /// <returns></returns>
 private: vector<Unit> GetUnitsForCellAndHerNeighbors(const Point &cellPosition)
 {
-    vector<Unit> neighborsForCell = vector<Unit>();
     Point keyCells[] =//получить позиции всех соседних ячеек и самой указанной ячейки.
     {
         Point(cellPosition.x, cellPosition.y),
@@ -103,6 +109,7 @@ private: vector<Unit> GetUnitsForCellAndHerNeighbors(const Point &cellPosition)
         Point(cellPosition.x - 1, cellPosition.y + 1),
     };
 
+    set<Unit> neighborsForCellSet;
     Point key;
     for (int i = 0; i < 9; i++)
     {
@@ -111,8 +118,15 @@ private: vector<Unit> GetUnitsForCellAndHerNeighbors(const Point &cellPosition)
         auto end = (unitsInCell).end();
         for (auto it = (unitsInCell).begin(); it != end; ++it)
         {
-            neighborsForCell.push_back(*it);
+            neighborsForCellSet.insert(*it);
         }
+    }
+
+    vector<Unit> neighborsForCell = vector<Unit>();
+    auto end = (neighborsForCellSet).end();
+    for (auto it = (neighborsForCellSet).begin(); it != end; ++it)
+    {
+        neighborsForCell.push_back(*it);
     }
 
     return neighborsForCell;
@@ -124,6 +138,7 @@ private: vector<Unit> GetUnitsForCellAndHerNeighbors(const Point &cellPosition)
 private: void PlaceUnitsOnMap()
     {
         const int countOfUnits = this->countOfUnits;
+        int unitsCountHave = 0;
         const int mapCellSize = this->MAP_CELL_SIZE;
         //расстояние размещения друг от друга
         int distanceBeetwenUnits = 1;
@@ -140,8 +155,8 @@ private: void PlaceUnitsOnMap()
         //Точка конца по у
         const int yEnd = -step * distanceBeetwenUnits;
 
-        for (int x = xStart; x < xEnd; x += distanceBeetwenUnits)
-            for (int y = yStart; y < yEnd; y += distanceBeetwenUnits)
+        for (int x = xStart; x >= xEnd; x -= distanceBeetwenUnits)
+            for (int y = yStart; y >= yEnd; y -= distanceBeetwenUnits)
             {
                 Point position = Point(x, y);
                 Unit u = Unit();
@@ -160,6 +175,10 @@ private: void PlaceUnitsOnMap()
                 }
                 this->cellsWithUnits[cellPosition].push_back(u);
                 this->units.push_back(u);
+
+                ++unitsCountHave;
+                if (unitsCountHave >= countOfUnits)
+                    return;
             }
     }
 public:
@@ -173,7 +192,7 @@ public:
         auto end = (*units).end();
         for (auto it = (*units).begin(); it != end; ++it)
         {
-            (*it).FindNumberOfUnitsThatThisUnitSees((*units));
+            (*it).FindCountOfUnitsThatThisUnitSees((*units));
         }
     }
     /// <summary>
@@ -188,8 +207,9 @@ public:
         auto end = (*units).end();
         for (auto it = (*units).begin(); it != end; ++it)
         {
-            neighbors = GetUnitsForCellAndHerNeighbors(GetCellForUnit((*it).location));
-            (*it).FindNumberOfUnitsThatThisUnitSees(neighbors);
+            Point p = GetCellForUnit((*it).location);
+            neighbors = GetUnitsForCellAndHerNeighbors(p);
+            (*it).FindCountOfUnitsThatThisUnitSees(neighbors);
         }
     }
     /// <summary>
@@ -233,7 +253,7 @@ public:
         auto end = (*units).begin()+endNumer;
         for (auto it = start; it != end; ++it)
         {
-            (*it).FindNumberOfUnitsThatThisUnitSees((*units));
+            (*it).FindCountOfUnitsThatThisUnitSees((*units));
         }
     }
 

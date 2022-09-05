@@ -35,6 +35,7 @@ public:
     /// Номера юнитов, которые видны этому юниту.
     /// </summary>
     std::vector<int> numbersUnitsInDirectionOfSight;
+    int countUnitsInDirectionOfSight;
     /// <summary>
     /// Половина угла обзора в радианах.
     /// По умолчанию: (135.5/2) * (PI / 180)
@@ -143,8 +144,10 @@ public:
         {
             if (this->UnitIsVisible(listOfUnits[i].location))
             {
+                ++countVisibleUnits;
             }
         }
+        this->countUnitsInDirectionOfSight = countVisibleUnits;
     }
     /// <summary>
     /// Узнать номера юнитов, которых видит этот юнит.
@@ -230,10 +233,22 @@ public:
 
         return returnString;
     }
-    inline
+    
     bool operator<(const Unit &other) const
     {
-        return this->location < other.location;
+        bool res = this->location > other.location;
+        return res;
+    }
+    inline
+    bool operator==(const Unit &other) const
+    {
+        return this->location == other.location;
+    }
+    
+    inline
+    bool operator!=(const Unit &other) const
+    {
+        return this->location != other.location;
     }
 
 };
