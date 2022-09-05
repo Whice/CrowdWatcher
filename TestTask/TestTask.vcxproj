@@ -148,10 +148,12 @@
     <ClCompile Include="CrowdWatcher.cpp" />
   </ItemGroup>
   <ItemGroup>
+    <ClInclude Include="Consts.h" />
     <ClInclude Include="Point.h" />
     <ClInclude Include="Tests.h" />
     <ClInclude Include="Unit.h" />
     <ClInclude Include="Units.h" />
+    <ClInclude Include="Vector2.h" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">

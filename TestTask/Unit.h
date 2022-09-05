@@ -4,8 +4,9 @@
 #include <cstring>
 #include <string>
 #include <math.h>
+#include "Vector2.h"
+#include "Consts.h"
 
-const double PI = 3.141592653;
 
 /// <summary>
 /// Класс определяющий юнита.
@@ -22,6 +23,8 @@ public:
     {
         this->location = location;
         this->directionOfSight = directionOfSight;
+        this->direction = Vector2(directionOfSight.x, directionOfSight.y);
+        this->direction.Normalize();
     }
     /// <summary>
     /// Позиция юнита.
@@ -31,6 +34,10 @@ public:
     /// Точка, куда направлен взгляд юнита. Центр сектора.
     /// </summary>
     Point directionOfSight;
+    /// <summary>
+    /// Направление взгляда юнита.
+    /// </summary>
+    Vector2 direction;
     /// <summary>
     /// Номера юнитов, которые видны этому юниту.
     /// </summary>
@@ -56,40 +63,48 @@ private:
 /// <returns></returns>
     inline bool IsUnitInSight(Point positionUnit)
     {
-        //Сдвинуть все точки так, чтобы этот юнит был в координатах 0;0
-        double shiftX = this->location.x;
-        double shiftY = this->location.y;
-        Point shiftDirectionOfSight = Point(this->directionOfSight.x - shiftX, this->directionOfSight.y - shiftY);
-        Point shiftPositionUnit = Point(positionUnit.x - shiftX, positionUnit.y - shiftY);
+        Vector2 distance;
+        distance.SetFromTwoPoints(this->location, positionUnit);
+        if (distance.Dot(this->direction) > 0)
+        {
 
-        // Т.к. atan2 работает с пи по -пи, то по абсцисс можно отразить координаты.
-        if (shiftPositionUnit.x < 0)
-        {
-            shiftPositionUnit.x *= -1;
-            shiftDirectionOfSight.x *= -1;
+            //Сдвинуть все точки так, чтобы этот юнит был в координатах 0;0
+            double shiftX = this->location.x;
+            double shiftY = this->location.y;
+            Point shiftDirectionOfSight = Point(this->directionOfSight.x - shiftX, this->directionOfSight.y - shiftY);
+            Point shiftPositionUnit = Point(positionUnit.x - shiftX, positionUnit.y - shiftY);
+
+            // Т.к. atan2 работает с пи по -пи, то по абсцисс можно отразить координаты.
+            if (shiftPositionUnit.x < 0)
+            {
+                shiftPositionUnit.x *= -1;
+                shiftDirectionOfSight.x *= -1;
+            }
+
+            //Если позиция юнита "за спиной" у смотрящего.
+            // Позиции не могут быть далеко длпруг от друга из-за ограниченности дальности видимости.
+            // Потому можно перемножать и не боться переполнения.
+            if ((shiftDirectionOfSight.x * shiftPositionUnit.x < 0) &&
+                (shiftDirectionOfSight.y * shiftPositionUnit.y < 0))
+            {
+                return false;
+            }
+            //найти в радианах соответствующие углы зрению и метоположению
+            double angleOfView = atan2(shiftDirectionOfSight.y, shiftDirectionOfSight.x);
+            double angleOfVectorToUnit = atan2(shiftPositionUnit.y, shiftPositionUnit.x);
+
+            //Если разница между углом зрения и местоположением меньше половины угла обзора, то юнит видно.
+            if (abs(angleOfView - angleOfVectorToUnit) < this->halfOfVisionAngleInRadians)
+            {
+                return true;
+            }
+            else
+            {
+                return false;
+            }
         }
 
-        //Если позиция юнита "за спиной" у смотрящего.
-        // Позиции не могут быть далеко длпруг от друга из-за ограниченности дальности видимости.
-        // Потому можно перемножать и не боться переполнения.
-        if ((shiftDirectionOfSight.x * shiftPositionUnit.x < 0) &&
-            (shiftDirectionOfSight.y * shiftPositionUnit.y < 0))
-        {
-            return false;
-        }
-        //найти в радианах соответствующие углы зрению и метоположению
-        double angleOfView = atan2(shiftDirectionOfSight.y, shiftDirectionOfSight.x);
-        double angleOfVectorToUnit = atan2(shiftPositionUnit.y, shiftPositionUnit.x);
-
-        //Если разница между углом зрения и местоположением меньше половины угла обзора, то юнит видно.
-        if (abs(angleOfView - angleOfVectorToUnit) < this->halfOfVisionAngleInRadians)
-        {
-            return true;
-        }
-        else
-        {
-            return false;
-        }
+        return false;
     }
     /// <summary>
     /// Проверить находится ли юнит в пределах коружности или на ее границе.

@@ -13,7 +13,7 @@ int main()
 {
 
     setlocale(LC_ALL, "");
-    
+
     //Создать тестовый объект
     Tests test;
     //Тесты скорости
