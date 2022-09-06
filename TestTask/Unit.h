@@ -85,7 +85,7 @@ private:
 /// </summary>
 /// <param name="positionUnit">Местонахождение наблюдаемого юнита.</param>
 /// <returns></returns>
-    inline bool IsUnitInSightOld(Point positionUnit)
+    inline bool IsUnitInSightOld(const Point &positionUnit)
     {
         //Сдвинуть все точки так, чтобы этот юнит был в координатах 0;0
         double shiftX = this->location.x;
@@ -195,7 +195,7 @@ public:
     /// Узнать количество юнитов, которых видит этот юнит.
     /// </summary>
     /// <param name="listOfUnits"></param>
-    void FindCountOfUnitsThatThisUnitSees(std::vector<Unit>& listOfUnits)
+    void FindCountOfUnitsThatThisUnitSees(const std::vector<Unit>& listOfUnits)
     {
         int countVisibleUnits = 0;
         const int countOfUnits = listOfUnits.size();
